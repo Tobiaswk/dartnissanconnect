@@ -81,6 +81,7 @@ class NissanConnectSession {
   Future<NissanConnectVehicle> login({String username, String password}) async {
     this.username = username;
     this.password = password;
+    this.bearerToken = null;
 
     Map<String, String> headers = Map();
     headers["Accept-Api-Version"] = 'protocol=1.0,resource=2.1';
