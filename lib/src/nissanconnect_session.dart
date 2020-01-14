@@ -142,9 +142,8 @@ class NissanConnectSession {
           ]
         });
 
-    //String authCookie = response.headers['set-cookie'];
-    //authCookie = authCookie.replaceAll('kauthSession="', '').replaceAll('"; Path=/; Secure; HttpOnly', '').trim();
-    String authCookie = response.body['tokenId'];
+    var authCookie = response.body['tokenId'];
+
     headers = Map<String, String>();
     headers["Host"] = "prod.eu.auth.kamereon.org";
     headers["Upgrade-Insecure-Requests"] = "1";
