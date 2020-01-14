@@ -31,7 +31,7 @@ class NissanConnectSession {
       await login(username: username, password: password);
 
       response =
-          await request(endpoint: endpoint, method: method, params: params);
+          await request(endpoint: endpoint, method: method, additionalHeaders: additionalHeaders, params: params);
     }
     return response;
   }
