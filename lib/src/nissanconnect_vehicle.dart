@@ -27,7 +27,9 @@ class NissanConnectVehicle {
     var response = await session.requestWithRetry(
         endpoint:
             "https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/v1/cars/$vin/actions/refresh-battery-status",
-        additionalHeaders: headers,
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
         params: {
           "data": {"type": "RefreshBatteryStatus"}
         });
@@ -38,8 +40,8 @@ class NissanConnectVehicle {
   Future<bool> requestBatteryStatus() async {
     var response = await session.requestWithRetry(
         endpoint:
-        "https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/v1/cars/$vin/actions/battery-status",
-        );
+            "https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/v1/cars/$vin/actions/battery-status",
+        method: 'GET');
 
     return response.statusCode == 200;
   }
