@@ -1,4 +1,5 @@
 import 'package:dartnissanconnect/dartnissanconnect.dart';
+import 'package:dartnissanconnect/src/date_helper.dart';
 import 'package:dartnissanconnect/src/nissanconnect_location.dart';
 import 'package:dartnissanconnect/src/nissanconnect_stats.dart';
 import 'package:dartnissanconnect/src/nissanconnect_trips.dart';
@@ -21,12 +22,12 @@ class NissanConnectVehicle {
     this.nickname,
   );
 
-  Future<bool> requestBatteryStatusUpdate() async {
+  Future<bool> requestBatteryStatusRefresh() async {
     Map headers = Map<String, String>();
-    headers["Host"] = 'application/vnd.api+json';
+    headers["Host"] = "application/vnd.api+json";
     var response = await session.requestWithRetry(
         endpoint:
-            "https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/v1/cars/$vin/actions/refresh-battery-status",
+            "${session.settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/refresh-battery-status",
         additionalHeaders: <String, String>{
           "Content-Type": "application/vnd.api+json"
         },
@@ -37,13 +38,14 @@ class NissanConnectVehicle {
     return response.statusCode == 200;
   }
 
-  Future<bool> requestBatteryStatus() async {
+  Future<NissanConnectBattery> requestBatteryStatus() async {
     var response = await session.requestWithRetry(
         endpoint:
-            "https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/v1/cars/$vin/actions/battery-status",
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/battery-status",
         method: 'GET');
 
-    return response.statusCode == 200;
+    return NissanConnectBattery(response.body);
   }
 
   Future<NissanConnectStats> requestDailyStatistics(DateTime date) async {
@@ -84,58 +86,151 @@ class NissanConnectVehicle {
 
   Future<bool> requestChargingStart() async {
     var response = await session.requestWithRetry(
-        endpoint: "battery/vehicles/$vin/remoteChargingRequest",
-        method: "POST");
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/charging-start",
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
+        params: {
+          "data": {"type": "ChargingStart", "attributes": "start"}
+        });
 
     return response.statusCode == 200;
   }
 
-  Future<bool> requestClimateControlOn(DateTime date) async {
+  Future<bool> requestEngineStart() async {
     var response = await session.requestWithRetry(
-        endpoint: "hvac/vehicles/$vin/activateHVAC",
-        method: "POST",
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/engine-start",
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
         params: {
-          "executionTime": _executionTimeFormatter.format(date.toUtc())
+          "data": {"type": "EngineStart", "attributes": "start"}
         });
 
-    return response.body['messageDeliveryStatus'] == 'Success';
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestClimateControlOn(DateTime date,
+      int temperatureTarget) async {
+    var response = await session.requestWithRetry(
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/hvac-start",
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
+        params: {
+          "data": {
+            "type": "HvacStart",
+            "attributes": {
+              "action": "start",
+              "targetTemperature": temperatureTarget,
+              "startDateTime": formatDateWithTimeZone(new DateTime.now()
+                  .add(new Duration(seconds: 5))) // must be in the future
+            }
+          }
+        });
+
+    return response.statusCode == 200;
   }
 
   Future<bool> requestClimateControlScheduledCancel() async {
     var response = await session.requestWithRetry(
-        endpoint: "hvacSchedule/vehicles/$vin/cancelHVACSchedule",
-        method: "POST");
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/hvac-start",
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
+        params: {
+          "data": {
+            "type": "HvacStart",
+            "attributes": {
+              "action": "cancel",
+              "targetTemperature": 21,
+              "startDateTime": formatDateWithTimeZone(new DateTime.now()
+                  .add(new Duration(seconds: 5))) // must be in the future
+            }
+          }
+        });
 
-    return response.body['messageDeliveryStatus'] == 'Success';
+    return response.statusCode == 200;
   }
 
   Future<bool> requestClimateControlOff() async {
     var response = await session.requestWithRetry(
-        endpoint: "hvac/vehicles/$vin/deactivateHVAC", method: "POST");
-
-    return response.body['messageDeliveryStatus'] == 'Success';
-  }
-
-  Future<DateTime> requestClimateControlScheduled() async {
-    var response = await session.requestWithRetry(
-        endpoint: "hvacSchedule/vehicles/$vin/getHvacSchedule", method: "GET");
-
-    return new DateFormat("yyyy-MM-dd'T'H:m:s")
-        .parse(response.body['executeTime'], true)
-        .toLocal();
-  }
-
-  Future<NissanConnectLocation> requestLocation(DateTime date) async {
-    var response = await session.requestWithRetry(
-        endpoint: "vehicleLocator/vehicles/$vin/refreshVehicleLocator",
-        method: "POST",
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/hvac-start",
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
         params: {
-          "acquiredDataUpperLimit": "1",
-          "searchPeriod":
-              "${new DateFormat('yyyyMMdd').format(date.subtract(new Duration(days: 30)))},${new DateFormat('yyyyMMdd').format(date)}",
-          "serviceName": "MyCarFinderResult"
+          "data": {
+            "type": "HvacStart",
+            "attributes": {
+              "action": "stop",
+              "targetTemperature": 21,
+              "startDateTime": formatDateWithTimeZone(new DateTime.now()
+                  .add(new Duration(seconds: 5))) // must be in the future
+            }
+          }
         });
 
-    return new NissanConnectLocation(response.body);
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestClimateControlStatusUpdate() async {
+    var response = await session.requestWithRetry(
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/refresh-hvac-status",
+        params: {
+          "data": {"type": "RefreshHvacStatus"}
+        });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestClimateControlStatus() async {
+    var response = await session.requestWithRetry(
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/hvac-status",
+        method: 'GET');
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestLocationRefresh() async {
+    Map headers = Map<String, String>();
+    headers["Host"] = "application/vnd.api+json";
+    var response = await session.requestWithRetry(
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/actions/refresh-location",
+        additionalHeaders: <String, String>{
+          "Content-Type": "application/vnd.api+json"
+        },
+        params: {
+          "data": {"type": "RefreshLocation"}
+        });
+
+    return response.statusCode == 200;
+  }
+
+  Future<NissanConnectLocation> requestLocation() async {
+    Map headers = Map<String, String>();
+    headers["Host"] = "application/vnd.api+json";
+    var response = await session.requestWithRetry(
+        endpoint:
+        "${session
+            .settings["EU"]["car_adapter_base_url"]}v1/cars/$vin/location",
+        method: 'GET');
+
+    return NissanConnectLocation(response.body['data']['attributes']);
   }
 }

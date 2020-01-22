@@ -4,36 +4,36 @@ class UnitCalculator {
   NumberFormat numberFormat00 = new NumberFormat('0.00');
   NumberFormat numberFormat0 = new NumberFormat('0');
 
-  kWhPerKilometers(double consumptionWh, double distanceMeters) {
-    return 1 / (toKilometers(distanceMeters) / (consumptionWh / 1000));
+  kWhPerKilometers(double consumptionWh, double distanceKilometers) {
+    return 1 / (distanceKilometers / (consumptionWh / 1000));
   }
 
-  kWhPerKilometersPretty(double consumptionWh, double distanceMeters) {
-    return format00(kWhPerKilometers(consumptionWh, distanceMeters));
+  kWhPerKilometersPretty(double consumptionWh, double distanceKilometers) {
+    return format00(kWhPerKilometers(consumptionWh, distanceKilometers));
   }
 
-  kilometersPerKWh(double consumptionWh, double distanceMeters) {
-    return toKilometers(distanceMeters) / (consumptionWh / 1000);
+  kilometersPerKWh(double consumptionWh, double distanceKilometers) {
+    return distanceKilometers / (consumptionWh / 1000);
   }
 
-  kilometersPerKWhPretty(double consumptionWh, double distanceMeters) {
-    return format00(kilometersPerKWh(consumptionWh, distanceMeters));
+  kilometersPerKWhPretty(double consumptionWh, double distanceKilometers) {
+    return format00(kilometersPerKWh(consumptionWh, distanceKilometers));
   }
 
-  kWhPerMiles(double consumptionWh, double distanceMeters) {
-    return 1 / (toMiles(distanceMeters) / (consumptionWh / 1000));
+  kWhPerMiles(double consumptionWh, double distanceKilometers) {
+    return 1 / (toMiles(distanceKilometers) / (consumptionWh / 1000));
   }
 
-  kWhPerMilesPretty(double consumptionWh, double distanceMeters) {
-    return format00(kWhPerMiles(consumptionWh, distanceMeters));
+  kWhPerMilesPretty(double consumptionWh, double distanceKilometers) {
+    return format00(kWhPerMiles(consumptionWh, distanceKilometers));
   }
 
-  milesPerKWh(double consumptionWh, double distanceMeters) {
-    return toMiles(distanceMeters) / (consumptionWh / 1000);
+  milesPerKWh(double consumptionWh, double distanceKilometers) {
+    return toMiles(distanceKilometers) / (consumptionWh / 1000);
   }
 
-  milesPerKWhPretty(double consumptionWh, double distanceMeters) {
-    return format00(milesPerKWh(consumptionWh, distanceMeters));
+  milesPerKWhPretty(double consumptionWh, double distanceKilometers) {
+    return format00(milesPerKWh(consumptionWh, distanceKilometers));
   }
 
   WhtoKWh(double wh) {
@@ -44,20 +44,16 @@ class UnitCalculator {
     return format00(WhtoKWh(wh));
   }
 
-  toMiles(double distanceMeters) {
-    return distanceMeters * 0.0006213712;
+  toMiles(double distanceKilometers) {
+    return distanceKilometers * 0.62137;
   }
 
-  toMilesPretty(double distanceMeters) {
-    return format0(toMiles(distanceMeters));
+  toMilesPretty(double distanceKilometers) {
+    return format0(toMiles(distanceKilometers));
   }
 
-  toKilometers(double distanceMeters) {
-    return distanceMeters / 1000;
-  }
-
-  toKilometersPretty(double distanceMeters) {
-    return format0(toKilometers(distanceMeters));
+  toKilometersPretty(double distanceKilometers) {
+    return format0(distanceKilometers);
   }
 
   format00(double value) {

@@ -10,7 +10,7 @@ environment:
 dependencies:
   intl: '^0.15.7'
   http: '^0.12.0'
-  dio: '^3.0.8' #latest version
+  date_format: '^1.0.8'
 
 dev_dependencies:
   test: '^1.3.0'

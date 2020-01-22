@@ -8,6 +8,23 @@ class NissanConnectSession {
   bool debug;
   List<String> debugLog = List<String>();
 
+  Map settings = <String, Map>{
+    "EU": <String, String>{
+      "client_id": "a-ncb-prod-android",
+      "client_secret":
+          "3LBs0yOx2XO-3m4mMRW27rKeJzskhfWF0A8KUtnim8i/qYQPl8ZItp3IaqJXaYj_",
+      "scope": "openid profile vehicles",
+      "auth_base_url": "https://prod.eu.auth.kamereon.org/kauth/",
+      "realm": "a-ncb-prod",
+      "redirect_uri": "org.kamereon.service.nci:/oauth2redirect",
+      "car_adapter_base_url":
+          "https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/",
+      "user_adapter_base_url":
+          "https://alliance-platform-usersadapter-prod.apps.eu.kamereon.io/user-adapter/",
+      "user_base_url": "https://nci-bff-web-prod.apps.eu.kamereon.io/bff-web/"
+    }
+  };
+
   var username;
   var password;
   var bearerToken;
@@ -17,10 +34,15 @@ class NissanConnectSession {
 
   NissanConnectSession({this.debug = false});
 
-  Future<NissanConnectResponse> requestWithRetry(
-      {String endpoint, String method = "POST", Map additionalHeaders, Map params}) async {
-    NissanConnectResponse response =
-        await request(endpoint: endpoint, method: method, additionalHeaders: additionalHeaders, params: params);
+  Future<NissanConnectResponse> requestWithRetry({String endpoint,
+    String method = "POST",
+    Map additionalHeaders,
+    Map params}) async {
+    NissanConnectResponse response = await request(
+        endpoint: endpoint,
+        method: method,
+        additionalHeaders: additionalHeaders,
+        params: params);
 
     var status = response.statusCode;
 
@@ -30,8 +52,11 @@ class NissanConnectSession {
 
       await login(username: username, password: password);
 
-      response =
-          await request(endpoint: endpoint, method: method, additionalHeaders: additionalHeaders, params: params);
+      response = await request(
+          endpoint: endpoint,
+          method: method,
+          additionalHeaders: additionalHeaders,
+          params: params);
     }
     return response;
   }
@@ -187,14 +212,14 @@ class NissanConnectSession {
 
     response = await request(
         endpoint:
-            "https://alliance-platform-usersadapter-prod.apps.eu.kamereon.io/user-adapter/v1/users/current",
+        "${settings["EU"]["user_adapter_base_url"]}v1/users/current",
         method: 'GET');
 
     var userId = response.body['userId'];
 
     response = await request(
         endpoint:
-            "https://nci-bff-web-prod.apps.eu.kamereon.io/bff-web/v2/users/$userId/cars",
+        "${settings["EU"]["user_base_url"]}v2/users/$userId/cars",
         method: 'GET');
 
     vehicles = List<NissanConnectVehicle>();
