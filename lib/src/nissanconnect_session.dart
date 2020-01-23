@@ -5,10 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class NissanConnectSession {
-  bool debug;
-  List<String> debugLog = List<String>();
-
-  Map settings = <String, Map>{
+    Map settings = <String, Map>{
     "EU": <String, String>{
       "client_id": "a-ncb-prod-android",
       "client_secret":
@@ -24,6 +21,12 @@ class NissanConnectSession {
       "user_base_url": "https://nci-bff-web-prod.apps.eu.kamereon.io/bff-web/"
     }
   };
+
+  var API_VERSION = "protocol=1.0,resource=2.1";
+  var SRP_KEY = "D5AF0E14718E662D12DBB4FE42304DF5A8E48359E22261138B40AA16CC85C76A11B43200A1EECB3C9546A262D1FBD51ACE6FCDE558C00665BBF93FF86B9F8F76AA7A53CA74F5B4DFF9A4B847295E7D82450A2078B5A28814A7A07F8BBDD34F8EEB42B0E70499087A242AA2C5BA9513C8F9D35A81B33A121EEF0A71F3F9071CCD";
+  
+  bool debug;
+  List<String> debugLog = List<String>();
 
   var username;
   var password;
@@ -109,36 +112,24 @@ class NissanConnectSession {
     this.bearerToken = null;
 
     Map<String, String> headers = Map();
-    headers["Accept-Api-Version"] = 'protocol=1.0,resource=2.1';
-    headers["Host"] = "prod.eu.auth.kamereon.org";
-    headers["Accept-Api-Version"] = "protocol=1.0,resource=2.1";
-    headers["Origin"] = "https://prod.eu.auth.kamereon.org";
-    headers["X-Password"] = "anonymous";
-    headers["Accept-Language"] = "en-UK";
+    headers["Accept-Api-Version"] = API_VERSION;
     headers["X-Username"] = "anonymous";
-    headers["User-Agent"] =
-        "Mozilla/5.0 (Linux; Android 5.1.1; SM-N950N Build/NMF26X; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36";
+    headers["X-Password"] = "anonymous";
     headers["Content-Type"] = "application/json";
-    headers["Accept"] = "application/json, text/javascript, */*; q=0.01";
-    headers["Cache-Control"] = "no-cache";
-    headers["X-Requested-With"] = "XMLHttpRequest";
-    headers["X-Nosession"] = "true";
-    headers["Referer"] =
-        "https://prod.eu.auth.kamereon.org/kauth/XUI/?realm=%2Fa-ncb-prod&goto=https%3A%2F%2Fprod.eu.auth.kamereon.org%2Fkauth%2Foauth2%2Fa-ncb-prod%2Fauthorize%3Fclient_id%3Da-ncb-prod-android%26redirect_uri%3Dorg.kamereon.service.nci%253A%252Foauth2redirect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520vehicles%26state%3Daf0ifjsldkj%26nonce%3Dsdfdsfez";
-    headers["Cookie"] = "i18next=en-UK";
+    headers["Accept"] = "application/json";
 
     NissanConnectResponse response = await request(
         endpoint:
-            "https://prod.eu.auth.kamereon.org/kauth/json/realms/root/realms/a-ncb-prod/authenticate?goto=https%3A%2F%2Fprod.eu.auth.kamereon.org%2Fkauth%2Foauth2%2Fa-ncb-prod%2Fauthorize%3Fclient_id%3Da-ncb-prod-android%26redirect_uri%3Dorg.kamereon.service.nci%253A%252Foauth2redirect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520vehicles%26state%3Daf0ifjsldkj%26nonce%3Dsdfdsfez",
+            "${settings["EU"]["auth_base_url"]}json/realms/root/realms/${settings["EU"]["realm"]}/authenticate",
         additionalHeaders: headers);
 
     var authId = response.body["authId"];
 
-    headers['Cookie'] = response.headers['set-cookie'];
+    //headers['Cookie'] = response.headers['set-cookie'];
 
     response = await request(
         endpoint:
-            "https://prod.eu.auth.kamereon.org/kauth/json/realms/root/realms/a-ncb-prod/authenticate?goto=https%3A%2F%2Fprod.eu.auth.kamereon.org%2Fkauth%2Foauth2%2Fa-ncb-prod%2Fauthorize%3Fclient_id%3Da-ncb-prod-android%26redirect_uri%3Dorg.kamereon.service.nci%253A%252Foauth2redirect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520vehicles%26state%3Daf0ifjsldkj%26nonce%3Dsdfdsfez",
+            "${settings["EU"]["auth_base_url"]}json/realms/root/realms/${settings["EU"]["realm"]}/authenticate",
         additionalHeaders: headers,
         params: {
           "authId": authId,
@@ -170,18 +161,8 @@ class NissanConnectSession {
     var authCookie = response.body['tokenId'];
 
     headers = Map<String, String>();
-    headers["Host"] = "prod.eu.auth.kamereon.org";
-    headers["Upgrade-Insecure-Requests"] = "1";
-    headers["User-Agent"] =
-        "Mozilla/5.0 (Linux; Android 5.1.1; SM-N950N Build/NMF26X; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36";
-    headers["Accept"] =
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3";
-    headers["Referer"] =
-        "https://prod.eu.auth.kamereon.org/kauth/XUI/?realm=%2Fa-ncb-prod&goto=https%3A%2F%2Fprod.eu.auth.kamereon.org%2Fkauth%2Foauth2%2Fa-ncb-prod%2Fauthorize%3Fclient_id%3Da-ncb-prod-android%26redirect_uri%3Dorg.kamereon.service.nci%253A%252Foauth2redirect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520vehicles%26state%3Daf0ifjsldkj%26nonce%3Dsdfdsfez";
-    headers["Accept-Language"] = "en-UK,en-US;q=0.9,en;q=0.8";
     headers["Cookie"] =
         "i18next=en-UK; amlbcookie=05; kauthSession=\"$authCookie\"";
-    headers["X-Requested-With"] = "com.android.browser";
 
     // Extremely dirty
     // The http client throws an error due to an invalid URI from the API
@@ -190,21 +171,21 @@ class NissanConnectSession {
     try {
       response = await request(
           endpoint:
-              "https://prod.eu.auth.kamereon.org/kauth/oauth2/a-ncb-prod/authorize?client_id=a-ncb-prod-android&redirect_uri=org.kamereon.service.nci%3A%2Foauth2redirect&response_type=code&scope=openid%20profile%20vehicles&state=af0ifjsldkj&nonce=sdfdsfez",
+              "${settings["EU"]["auth_base_url"]}oauth2${response.body["realm"]}/authorize?client_id=${settings["EU"]["client_id"]}&redirect_uri=${settings["EU"]["redirect_uri"]}&response_type=code&scope=${settings["EU"]["scope"]}&nonce=sdfdsfez",
           additionalHeaders: headers,
           method: 'GET');
+    print(response.body);
     } catch (e) {
       code = e.message.split("=")[1].split('&')[0];
     }
+	
 
     headers = Map<String, String>();
-    headers["Host"] = 'prod.eu.auth.kamereon.org';
-    headers["User-Agent"] = 'okhttp/3.11.0';
     headers["Content-Type"] = 'application/x-www-form-urlencoded';
 
     response = await request(
       endpoint:
-          "https://prod.eu.auth.kamereon.org/kauth/oauth2/a-ncb-prod/access_token?code=$code&client_id=a-ncb-prod-android&client_secret=3LBs0yOx2XO-3m4mMRW27rKeJzskhfWF0A8KUtnim8i%2FqYQPl8ZItp3IaqJXaYj_&redirect_uri=org.kamereon.service.nci%3A%2Foauth2redirect&grant_type=authorization_code",
+          "${settings["EU"]["auth_base_url"]}oauth2${response.body["realm"]}/access_token?code=$code&client_id=${settings["EU"]["client_id"]}&client_secret=${settings["EU"]["client_secret"]}&redirect_uri=${settings["EU"]["redirect_uri"]}&grant_type=authorization_code",
       additionalHeaders: headers,
     );
 
