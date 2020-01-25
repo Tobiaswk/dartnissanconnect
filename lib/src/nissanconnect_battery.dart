@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 enum ChargingSpeed { NONE, SLOW, NORMAL, FAST }
 
 class NissanConnectBattery {
-  NumberFormat numberFormat = new NumberFormat('0');
+  NumberFormat numberFormat = NumberFormat('0');
 
   DateTime dateTime;
   ChargingSpeed chargingSpeed;
@@ -25,17 +25,17 @@ class NissanConnectBattery {
   String chargingRemainingText;
 
   NissanConnectBattery(Map params) {
-    UnitCalculator unitCalculator = new UnitCalculator();
+    UnitCalculator unitCalculator = UnitCalculator();
 
-    var recs = params["data"]["attributes"];
-    this.dateTime = new DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    var recs = params['data']['attributes'];
+    this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
         .parse(recs['lastUpdateTime'])
         .toLocal();
     this.chargingSpeed = ChargingSpeed.values[recs['chargePower'] ?? 0];
     this.isConnected = recs['chargeStatus'] != 0;
     this.isCharging = recs['chargeStatus'] != 0;
     this.batteryPercentage =
-        new NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
+        NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
     this.cruisingRangeAcOffKm =
         numberFormat.format(recs['rangeHvacOff'].toDouble()) + ' km';
     this.cruisingRangeAcOffMiles = numberFormat
@@ -46,27 +46,26 @@ class NissanConnectBattery {
     this.cruisingRangeAcOnMiles = numberFormat
             .format(unitCalculator.toMiles(recs['rangeHvacOn'].toDouble())) +
         ' mi';
-    this.timeToFullSlow = new Duration(minutes: recs['timeRequiredToFullSlow']);
-    this.timeToFullNormal =
-        new Duration(minutes: recs['timeRequiredToFullNormal']);
-    this.timeToFullFast = new Duration(minutes: recs['timeRequiredToFullFast']);
+    this.timeToFullSlow = Duration(minutes: recs['timeRequiredToFullSlow']);
+    this.timeToFullNormal = Duration(minutes: recs['timeRequiredToFullNormal']);
+    this.timeToFullFast = Duration(minutes: recs['timeRequiredToFullFast']);
     switch (this.chargingSpeed) {
       case ChargingSpeed.NONE:
         break;
       case ChargingSpeed.SLOW:
-        chargingkWLevelText = "slow charging";
+        chargingkWLevelText = 'slow charging';
         chargingRemainingText =
-            "${timeToFullSlow.inHours} hrs ${timeToFullSlow.inMinutes} mins";
+            '${timeToFullSlow.inHours} hrs ${timeToFullSlow.inMinutes} mins';
         break;
       case ChargingSpeed.NORMAL:
-        chargingkWLevelText = "normal charging";
+        chargingkWLevelText = 'normal charging';
         chargingRemainingText =
-            "${timeToFullNormal.inHours} hrs ${timeToFullNormal.inMinutes} mins";
+            '${timeToFullNormal.inHours} hrs ${timeToFullNormal.inMinutes} mins';
         break;
       case ChargingSpeed.FAST:
-        chargingkWLevelText = "fast charging";
+        chargingkWLevelText = 'fast charging';
         chargingRemainingText =
-            "${timeToFullFast.inHours} hrs ${timeToFullFast.inMinutes} mins";
+            '${timeToFullFast.inHours} hrs ${timeToFullFast.inMinutes} mins';
         break;
     }
   }

@@ -14,10 +14,9 @@ class NissanConnectStats {
   Duration travelTime;
 
   NissanConnectStats(Map map) {
-    UnitCalculator unitCalculator = new UnitCalculator();
+    UnitCalculator unitCalculator = UnitCalculator();
 
-    this.co2ReductionKg =
-        "${map['co2Reduction'] ?? map['cO2Reduction']} kg";
+    this.co2ReductionKg = '${map['co2Reduction'] ?? map['cO2Reduction']} kg';
     this.milesPerKWh = unitCalculator.milesPerKWhPretty(
             double.parse(map['powerConsumptTotal']),
             double.parse(map['travelDistance'])) +
@@ -45,13 +44,15 @@ class NissanConnectStats {
             ' mi';
     this.travelTime = Duration(seconds: int.parse(map['travelTime']));
     if (map['targetDate'] != null) {
-      this.date = new DateFormat('yyyy-MM-dd').parse(map['targetDate'], true).toLocal();
+      this.date =
+          DateFormat('yyyy-MM-dd').parse(map['targetDate'], true).toLocal();
     } else if (map['targetMonth'] != null) {
       // https://stackoverflow.com/questions/51042621/unable-to-covert-string-date-in-format-yyyymmddhhmmss-to-datetime-dart
-      this.date = new DateFormat('yyyy.MM').parse(
+      this.date = DateFormat('yyyy.MM').parse(
           map['targetMonth'].substring(0, 4) +
               '.' +
-              map['targetMonth'].substring(4), true);
+              map['targetMonth'].substring(4),
+          true);
     }
   }
 }

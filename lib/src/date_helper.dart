@@ -11,5 +11,5 @@ String formatDateWithTimeZone(DateTime dateTime) {
   var datePart2 = formatDate(
           dateTime, [yyyy, '-', mm, '-', dd, 'T', HH, ':', nn, ':', ss, z])
       .substring(22, 24);
-  return "$datePart1:$datePart2";
+  return '$datePart1:$datePart2';
 }

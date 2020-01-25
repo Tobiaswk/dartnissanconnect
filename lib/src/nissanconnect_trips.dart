@@ -4,7 +4,7 @@ import 'package:dartnissanconnect/src/unit_calculator.dart';
 import 'package:intl/intl.dart';
 
 class NissanConnectTrips {
-  UnitCalculator unitCalculator = new UnitCalculator();
+  UnitCalculator unitCalculator = UnitCalculator();
   List<NissanConnectTrip> trips = List();
 
   NissanConnectTrips(Map map) {
@@ -14,9 +14,9 @@ class NissanConnectTrips {
         .toList();
 
     for (Map trip in trips) {
-      NissanConnectTrip nissanConnectTrip = new NissanConnectTrip();
+      NissanConnectTrip nissanConnectTrip = NissanConnectTrip();
       nissanConnectTrip.date =
-          new DateFormat('yyyy-MM-dd').parse(trip['targetDate']);
+          DateFormat('yyyy-MM-dd').parse(trip['targetDate']);
 
       double totalCo2reductionKg = 0;
       double totalWhUsed = 0;
@@ -24,11 +24,10 @@ class NissanConnectTrips {
 
       for (Map tripDetail in trip['priceSimulatorDetailInfoTripList']
           ['priceSimulatorDetailInfoTrip']) {
-        NissanConnectTripDetail connectTripDetail =
-            new NissanConnectTripDetail();
+        NissanConnectTripDetail connectTripDetail = NissanConnectTripDetail();
         connectTripDetail.tripId = int.parse(tripDetail['tripId']);
         connectTripDetail.co2ReductionKg =
-            "${tripDetail['cO2Reduction']} kg CO2";
+            '${tripDetail['cO2Reduction']} kg CO2';
         connectTripDetail.milesPerKWh = unitCalculator.milesPerKWhPretty(
                 double.parse(tripDetail['powerConsumptTotal']),
                 double.parse(tripDetail['travelDistance'])) +
@@ -65,7 +64,7 @@ class NissanConnectTrips {
         nissanConnectTrip.tripDetails.add(connectTripDetail);
       }
 
-      nissanConnectTrip.co2reductionKg = "${totalCo2reductionKg} CO2 kg";
+      nissanConnectTrip.co2reductionKg = '${totalCo2reductionKg} CO2 kg';
       nissanConnectTrip.milesPerKWh = unitCalculator.milesPerKWhPretty(
               totalWhUsed, totalTravelDistanceMeters) +
           ' miles/kWh';

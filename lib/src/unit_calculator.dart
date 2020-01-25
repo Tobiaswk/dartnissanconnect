@@ -1,8 +1,8 @@
 import 'package:intl/intl.dart';
 
 class UnitCalculator {
-  NumberFormat numberFormat00 = new NumberFormat('0.00');
-  NumberFormat numberFormat0 = new NumberFormat('0');
+  NumberFormat numberFormat00 = NumberFormat('0.00');
+  NumberFormat numberFormat0 = NumberFormat('0');
 
   kWhPerKilometers(double consumptionWh, double distanceKilometers) {
     return 1 / (distanceKilometers / (consumptionWh / 1000));
