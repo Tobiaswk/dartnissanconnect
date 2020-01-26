@@ -1,9 +1,10 @@
 import 'package:dartnissanconnect/src/unit_calculator.dart';
 import 'package:intl/intl.dart';
 
+enum Period { DAILY, MONTHLY, YEARLY }
+
 class NissanConnectStats {
   DateTime date;
-  String co2ReductionKg;
   String milesPerKWh;
   String kilometersPerKWh;
   String kWhPerMiles;
@@ -13,46 +14,38 @@ class NissanConnectStats {
   String travelDistanceKilometers;
   Duration travelTime;
 
-  NissanConnectStats(Map map) {
+  NissanConnectStats(Map trip) {
     UnitCalculator unitCalculator = UnitCalculator();
 
-    this.co2ReductionKg = '${map['co2Reduction'] ?? map['cO2Reduction']} kg';
     this.milesPerKWh = unitCalculator.milesPerKWhPretty(
-            double.parse(map['powerConsumptTotal']),
-            double.parse(map['travelDistance'])) +
+            trip['consumedElectricity'], trip['distance']) +
         ' mi/kWh';
     this.kWhPerMiles = unitCalculator.kWhPerMilesPretty(
-            double.parse(map['powerConsumptTotal']),
-            double.parse(map['travelDistance'])) +
+            trip['consumedElectricity'], trip['distance']) +
         ' kWh/mi';
     this.kilometersPerKWh = unitCalculator.kilometersPerKWhPretty(
-            double.parse(map['powerConsumptTotal']),
-            double.parse(map['travelDistance'])) +
+            trip['consumedElectricity'], trip['distance']) +
         ' km/kWh';
     this.kWhPerKilometers = unitCalculator.kWhPerKilometersPretty(
-            double.parse(map['powerConsumptTotal']),
-            double.parse(map['travelDistance'])) +
+            trip['consumedElectricity'], trip['distance']) +
         ' kWh/km';
     this.kWhUsed =
-        unitCalculator.WhtoKWhPretty(double.parse(map['powerConsumptTotal'])) +
-            ' kWh';
+        unitCalculator.WhtoKWhPretty(trip['consumedElectricity']) + ' kWh';
     this.travelDistanceKilometers =
-        unitCalculator.toKilometersPretty(double.parse(map['travelDistance'])) +
-            ' km';
+        unitCalculator.toKilometersPretty(trip['distance']) + ' km';
     this.travelDistanceMiles =
-        unitCalculator.toMilesPretty(double.parse(map['travelDistance'])) +
-            ' mi';
-    this.travelTime = Duration(seconds: int.parse(map['travelTime']));
-    if (map['targetDate'] != null) {
-      this.date =
-          DateFormat('yyyy-MM-dd').parse(map['targetDate'], true).toLocal();
-    } else if (map['targetMonth'] != null) {
-      // https://stackoverflow.com/questions/51042621/unable-to-covert-string-date-in-format-yyyymmddhhmmss-to-datetime-dart
-      this.date = DateFormat('yyyy.MM').parse(
-          map['targetMonth'].substring(0, 4) +
-              '.' +
-              map['targetMonth'].substring(4),
-          true);
+        unitCalculator.toMilesPretty(trip['distance']) + ' mi';
+    this.travelTime = Duration(minutes: trip['duration']);
+    this.date =
+        DateFormat("yyyy-MM-dd'T'H:m:s'Z'").parse(trip['firstTripStart']);
+  }
+
+  static List<NissanConnectStats> list(Map map) {
+    var trips = map['data']['attributes']['summaries'];
+    List<NissanConnectStats> result = List();
+    for (Map trip in trips) {
+      result.add(NissanConnectStats(trip));
     }
+    return result;
   }
 }

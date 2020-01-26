@@ -3,13 +3,10 @@ import 'package:dartnissanconnect/src/date_helper.dart';
 import 'package:dartnissanconnect/src/nissanconnect_hvac.dart';
 import 'package:dartnissanconnect/src/nissanconnect_location.dart';
 import 'package:dartnissanconnect/src/nissanconnect_stats.dart';
-import 'package:dartnissanconnect/src/nissanconnect_trips.dart';
 import 'package:intl/intl.dart';
 
 class NissanConnectVehicle {
   var _targetDateFormatter = DateFormat('yyyy-MM-dd');
-  var _targetMonthFormatter = DateFormat('yyyyMM');
-  var _executionTimeFormatter = DateFormat("yyyy-MM-dd'T'H:m:s'Z'");
 
   NissanConnectSession session;
   var vin;
@@ -48,40 +45,45 @@ class NissanConnectVehicle {
     return NissanConnectBattery(response.body);
   }
 
-  Future<NissanConnectStats> requestDailyStatistics(DateTime date) async {
+  Future<NissanConnectStats> requestMonthlyStatistics() async {
+    var start = DateTime(DateTime.now().year, DateTime.now().month, 1);
+    var end = DateTime.now();
     var response = await session.requestWithRetry(
-        endpoint: 'ecoDrive/vehicles/$vin/driveHistoryRecords',
-        method: 'POST',
-        params: {
-          'displayCondition': {'TargetDate': _targetDateFormatter.format(date)}
-        });
-
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.MONTHLY.index}',
+        method: 'GET');
     return NissanConnectStats(
-        response.body['personalData']['dateSummaryDetailInfo']);
+        response.body['data']['attributes']['summaries'].last);
   }
 
-  Future<NissanConnectStats> requestMonthlyStatistics(DateTime month) async {
+  Future<NissanConnectStats> requestDailyStatistics() async {
+    var start = DateTime.now();
+    var end = start;
     var response = await session.requestWithRetry(
-        endpoint: 'ecoDrive/vehicles/$vin/CarKarteGraphAllInfo',
-        method: 'POST',
-        params: {
-          'dateRangeLevel': 'DAILY',
-          'graphType': 'ALL',
-          'targetMonth': _targetMonthFormatter.format(month)
-        });
-
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.DAILY.index}',
+        method: 'GET');
     return NissanConnectStats(
-        response.body['carKarteGraphInfoResponseMonthPersonalData']
-            ['monthSummaryCarKarteDetailInfo']);
+        response.body['data']['attributes']['summaries'].last);
   }
 
-  Future<NissanConnectTrips> requestMonthlyStatisticsTrips(
-      DateTime month) async {
+  Future<List<NissanConnectStats>> requestMonthlyTripsStatistics(
+      DateTime dateTime) async {
+    var start, end;
+    start = DateTime(dateTime.year, dateTime.month, 1);
+    // If start is in the same month as 'now' we use the current date as end
+    if (dateTime.month == DateTime.now().month) {
+      end = DateTime.now();
+    } else {
+      // else find last day in month
+      end = DateTime(dateTime.year, dateTime.month + 1, 1)
+          .subtract(Duration(days: 1));
+    }
     var response = await session.requestWithRetry(
-        endpoint: 'electricusage/vehicles/$vin/detailpriceSimulatordata',
-        method: 'POST',
-        params: {'Targetmonth': _targetMonthFormatter.format(month)});
-    return NissanConnectTrips(response.body);
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.DAILY.index}',
+        method: 'GET');
+    return NissanConnectStats.list(response.body);
   }
 
   Future<bool> requestChargingStart() async {
@@ -113,7 +115,7 @@ class NissanConnectVehicle {
   }
 
   Future<bool> requestClimateControlOn(
-      DateTime date, int temperatureTarget) async {
+      DateTime date, int targetTemperature) async {
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/hvac-start',
@@ -125,7 +127,7 @@ class NissanConnectVehicle {
             'type': 'HvacStart',
             'attributes': {
               'action': 'start',
-              'targetTemperature': temperatureTarget,
+              'targetTemperature': targetTemperature,
               'startDateTime': formatDateWithTimeZone(DateTime.now()
                   .add(Duration(seconds: 5))) // must be in the future
             }
