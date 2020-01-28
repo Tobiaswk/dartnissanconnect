@@ -1,8 +1,6 @@
 import 'package:dartnissanconnect/src/unit_calculator.dart';
 import 'package:intl/intl.dart';
 
-enum Period { DAILY, MONTHLY, YEARLY }
-
 class NissanConnectStats {
   DateTime date;
   String milesPerKWh;

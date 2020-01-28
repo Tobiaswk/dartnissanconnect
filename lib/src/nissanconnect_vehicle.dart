@@ -5,6 +5,8 @@ import 'package:dartnissanconnect/src/nissanconnect_location.dart';
 import 'package:dartnissanconnect/src/nissanconnect_stats.dart';
 import 'package:intl/intl.dart';
 
+enum Period { DAILY, MONTHLY, YEARLY }
+
 class NissanConnectVehicle {
   var _targetDateFormatter = DateFormat('yyyy-MM-dd');
 
@@ -21,8 +23,6 @@ class NissanConnectVehicle {
   );
 
   Future<bool> requestBatteryStatusRefresh() async {
-    Map headers = Map<String, String>();
-    headers['Host'] = 'application/vnd.api+json';
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-battery-status',
@@ -181,7 +181,7 @@ class NissanConnectVehicle {
     return response.statusCode == 200;
   }
 
-  Future<bool> requestClimateControlStatusUpdate() async {
+  Future<bool> requestClimateControlStatusRefresh() async {
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-hvac-status',
@@ -201,8 +201,6 @@ class NissanConnectVehicle {
   }
 
   Future<bool> requestLocationRefresh() async {
-    Map headers = Map<String, String>();
-    headers['Host'] = 'application/vnd.api+json';
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-location',
@@ -217,8 +215,6 @@ class NissanConnectVehicle {
   }
 
   Future<NissanConnectLocation> requestLocation() async {
-    Map headers = Map<String, String>();
-    headers['Host'] = 'application/vnd.api+json';
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/location',
