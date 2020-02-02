@@ -147,12 +147,7 @@ class NissanConnectVehicle {
         params: {
           'data': {
             'type': 'HvacStart',
-            'attributes': {
-              'action': 'cancel',
-              'targetTemperature': 21,
-              'startDateTime': formatDateWithTimeZone(DateTime.now()
-                  .add(Duration(seconds: 5))) // must be in the future
-            }
+            'attributes': {'action': 'cancel', 'targetTemperature': 21}
           }
         });
 
@@ -185,6 +180,9 @@ class NissanConnectVehicle {
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-hvac-status',
+        additionalHeaders: <String, String>{
+          'Content-Type': 'application/vnd.api+json'
+        },
         params: {
           'data': {'type': 'RefreshHvacStatus'}
         });

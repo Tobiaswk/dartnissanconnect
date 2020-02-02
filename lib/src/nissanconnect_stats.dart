@@ -9,6 +9,7 @@ class NissanConnectStats {
   String kWhPerMiles;
   String kWhPerKilometers;
   String kWhUsed;
+  String kWhGained;
   String travelDistanceMiles;
   String travelDistanceKilometers;
   Duration travelTime;
@@ -31,6 +32,8 @@ class NissanConnectStats {
         ' kWh/km';
     this.kWhUsed =
         unitCalculator.WhtoKWhPretty(trip['consumedElectricity']) + ' kWh';
+    this.kWhGained =
+        unitCalculator.WhtoKWhPretty(trip['savedElectricity']) + ' kWh';
     this.travelDistanceKilometers =
         unitCalculator.toKilometersPretty(trip['distance']) + ' km';
     this.travelDistanceMiles =
