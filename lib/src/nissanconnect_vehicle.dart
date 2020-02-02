@@ -128,7 +128,7 @@ class NissanConnectVehicle {
             'attributes': {
               'action': 'start',
               'targetTemperature': targetTemperature,
-              'startDateTime': formatDateWithTimeZone(DateTime.now()
+              'startDateTime': formatDateWithTimeZone(date
                   .add(Duration(seconds: 5))) // must be in the future
             }
           }
