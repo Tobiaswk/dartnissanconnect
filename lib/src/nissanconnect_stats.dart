@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 class NissanConnectStats {
   DateTime date;
+  int tripsNumber;
   String milesPerKWh;
   String kilometersPerKWh;
   String kWhPerMiles;
@@ -15,6 +16,7 @@ class NissanConnectStats {
   NissanConnectStats(Map trip) {
     UnitCalculator unitCalculator = UnitCalculator();
 
+    this.tripsNumber = trip['tripsNumber'];
     this.milesPerKWh = unitCalculator.milesPerKWhPretty(
             trip['consumedElectricity'], trip['distance']) +
         ' mi/kWh';

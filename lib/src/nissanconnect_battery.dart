@@ -28,9 +28,17 @@ class NissanConnectBattery {
     UnitCalculator unitCalculator = UnitCalculator();
 
     var recs = params['data']['attributes'];
-    this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        .parse(recs['lastUpdateTime'])
-        .toLocal();
+    // For reasons unknown the lastUpdateTime sometimes includes
+    // seconds and sometimes not
+    try {
+      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+          .parse(recs['lastUpdateTime'], true)
+          .toLocal();
+    } catch (e) {
+      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+          .parse(recs['lastUpdateTime'], true)
+          .toLocal();
+    }
     this.chargingSpeed = ChargingSpeed.values[recs['chargePower'] ?? 0];
     this.isConnected = recs['chargeStatus'] != 0;
     this.isCharging = recs['chargeStatus'] != 0;

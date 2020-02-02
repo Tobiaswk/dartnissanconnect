@@ -207,7 +207,7 @@ class NissanConnectSession {
 
     for (Map vehicle in response.body['data']) {
       vehicles.add(NissanConnectVehicle(this, vehicle['vin'],
-          vehicle['modelName'], vehicle['nickname'] ?? vehicle['modelName']));
+          vehicle['modelName'], vehicle['nickname'] ?? '${vehicle['modelName']} ${vehicles.length+1}'));
     }
 
     return vehicle = vehicles.first;
