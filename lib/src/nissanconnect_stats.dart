@@ -12,8 +12,8 @@ class NissanConnectStats {
   String kWhGained;
   String travelDistanceMiles;
   String travelDistanceKilometers;
-  String travelSpeedMiles;
-  String travelSpeedKilometers;
+  String travelSpeedAverageMph;
+  String travelSpeedAverageKmh;
   Duration travelTime;
 
   NissanConnectStats(Map trip) {
@@ -41,10 +41,10 @@ class NissanConnectStats {
     this.travelDistanceMiles =
         unitCalculator.toMilesPretty(trip['distance']) + ' mi';
     this.travelTime = Duration(minutes: trip['duration']);
-    this.travelSpeedKilometers = unitCalculator.averageSpeedKilometersPretty(
+    this.travelSpeedAverageKmh = unitCalculator.averageSpeedKmhPretty(
             trip['distance'], travelTime.inMinutes) +
         ' km/h';
-    this.travelSpeedMiles = unitCalculator.averageSpeedMilesPretty(
+    this.travelSpeedAverageMph = unitCalculator.averageSpeedMphPretty(
             trip['distance'], travelTime.inMinutes) +
         ' mph';
     this.date =
