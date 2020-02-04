@@ -44,6 +44,14 @@ class UnitCalculator {
     return format00(WhtoKWh(wh));
   }
 
+  averageSpeedMilesPretty(double distanceKilometers, int minutes) {
+    return format0((toMiles(distanceKilometers) * 100) / minutes);
+  }
+
+  averageSpeedKilometersPretty(double distanceKilometers, int minutes) {
+    return format0((distanceKilometers * 100) / minutes);
+  }
+
   toMiles(double distanceKilometers) {
     return distanceKilometers * 0.62137;
   }

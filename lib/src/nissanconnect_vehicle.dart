@@ -100,6 +100,20 @@ class NissanConnectVehicle {
     return response.statusCode == 200;
   }
 
+  Future<bool> requestChargingStop() async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/charging-start',
+        additionalHeaders: <String, String>{
+          'Content-Type': 'application/vnd.api+json'
+        },
+        params: {
+          'data': {'type': 'ChargingStart', 'attributes': 'stop'}
+        });
+
+    return response.statusCode == 200;
+  }
+
   Future<bool> requestEngineStart() async {
     var response = await session.requestWithRetry(
         endpoint:
@@ -128,8 +142,8 @@ class NissanConnectVehicle {
             'attributes': {
               'action': 'start',
               'targetTemperature': targetTemperature,
-              'startDateTime': formatDateWithTimeZone(date
-                  .add(Duration(seconds: 5))) // must be in the future
+              'startDateTime': formatDateWithTimeZone(
+                  date.add(Duration(seconds: 5))) // must be in the future
             }
           }
         });
