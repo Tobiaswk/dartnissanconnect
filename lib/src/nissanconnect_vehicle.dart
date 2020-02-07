@@ -46,7 +46,7 @@ class NissanConnectVehicle {
   }
 
   Future<NissanConnectStats> requestMonthlyStatistics() async {
-    var start = DateTime(DateTime.now().year, DateTime.now().month, 1);
+    var start = DateTime.now().subtract(new Duration(days: 30));
     var end = DateTime.now();
     var response = await session.requestWithRetry(
         endpoint:
