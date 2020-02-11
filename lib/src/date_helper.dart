@@ -1,15 +1,39 @@
-import 'package:date_format/date_format.dart';
+import 'package:intl/intl.dart';
 
-// There is little to no timezone support with dates for dart
-// Therefore we use the date_format package here
-// it outputs timezone as '+0100' etc. we need '+01:10'
-// date_format does not support this so we do this here in a hacky way
-String formatDateWithTimeZone(DateTime dateTime) {
-  var datePart1 = formatDate(
-          dateTime, [yyyy, '-', mm, '-', dd, 'T', HH, ':', nn, ':', ss, z])
-      .substring(0, 22);
-  var datePart2 = formatDate(
-          dateTime, [yyyy, '-', mm, '-', dd, 'T', HH, ':', nn, ':', ss, z])
-      .substring(22, 24);
-  return '$datePart1:$datePart2';
+String _digits(int value, int length) {
+  String ret = '$value';
+  if (ret.length < length) {
+    ret = '0' * (length - ret.length) + ret;
+  }
+  return ret;
 }
+
+String formatDateWithTimeZone(DateTime dateTime) {
+  var year = dateTime.year;
+  var month = NumberFormat('00').format(dateTime.month);
+  var day = NumberFormat('00').format(dateTime.day);
+  var hour = NumberFormat('00').format(dateTime.hour);
+  var minutes = NumberFormat('00').format(dateTime.minute);
+  var seconds = NumberFormat('00').format(dateTime.second);
+  Duration timeZoneOffset = dateTime.timeZoneOffset;
+  final timeZoneOffsetsb = StringBuffer();
+  if (timeZoneOffset.inMinutes == 0) {
+    timeZoneOffsetsb.write('Z');
+  } else {
+    if (timeZoneOffset.isNegative) {
+      timeZoneOffsetsb.write('-');
+      timeZoneOffsetsb.write(_digits((-timeZoneOffset.inHours) % 24, 2));
+      timeZoneOffsetsb.write(':');
+      timeZoneOffsetsb.write(_digits((-timeZoneOffset.inMinutes) % 60, 2));
+    } else {
+      timeZoneOffsetsb.write('+');
+      timeZoneOffsetsb.write(_digits(timeZoneOffset.inHours % 24, 2));
+      timeZoneOffsetsb.write(':');
+      timeZoneOffsetsb.write(_digits(timeZoneOffset.inMinutes % 60, 2));
+    }
+    var timezone = timeZoneOffsetsb.toString();
+
+    return "$year-$month-${day}T$hour:$minutes:${seconds}$timezone";
+  }
+}
+
