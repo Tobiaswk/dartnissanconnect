@@ -10,28 +10,28 @@ String _digits(int value, int length) {
 
 String formatDateWithTimeZone(DateTime dateTime) {
   var year = dateTime.year;
-  var month = NumberFormat('00').format(dateTime.month);
-  var day = NumberFormat('00').format(dateTime.day);
-  var hour = NumberFormat('00').format(dateTime.hour);
-  var minutes = NumberFormat('00').format(dateTime.minute);
-  var seconds = NumberFormat('00').format(dateTime.second);
+  var month = _digits(dateTime.month, 2);
+  var day = _digits(dateTime.day, 2);
+  var hour = _digits(dateTime.hour, 2);
+  var minutes = _digits(dateTime.minute, 2);
+  var seconds = _digits(dateTime.second, 2);
   Duration timeZoneOffset = dateTime.timeZoneOffset;
-  final timeZoneOffsetsb = StringBuffer();
+  final timeZoneOffsetSb = StringBuffer();
   if (timeZoneOffset.inMinutes == 0) {
-    timeZoneOffsetsb.write('Z');
+    timeZoneOffsetSb.write('Z');
   } else {
     if (timeZoneOffset.isNegative) {
-      timeZoneOffsetsb.write('-');
-      timeZoneOffsetsb.write(_digits((-timeZoneOffset.inHours) % 24, 2));
-      timeZoneOffsetsb.write(':');
-      timeZoneOffsetsb.write(_digits((-timeZoneOffset.inMinutes) % 60, 2));
+      timeZoneOffsetSb.write('-');
+      timeZoneOffsetSb.write(_digits((-timeZoneOffset.inHours) % 24, 2));
+      timeZoneOffsetSb.write(':');
+      timeZoneOffsetSb.write(_digits((-timeZoneOffset.inMinutes) % 60, 2));
     } else {
-      timeZoneOffsetsb.write('+');
-      timeZoneOffsetsb.write(_digits(timeZoneOffset.inHours % 24, 2));
-      timeZoneOffsetsb.write(':');
-      timeZoneOffsetsb.write(_digits(timeZoneOffset.inMinutes % 60, 2));
+      timeZoneOffsetSb.write('+');
+      timeZoneOffsetSb.write(_digits(timeZoneOffset.inHours % 24, 2));
+      timeZoneOffsetSb.write(':');
+      timeZoneOffsetSb.write(_digits(timeZoneOffset.inMinutes % 60, 2));
     }
-    var timezone = timeZoneOffsetsb.toString();
+    var timezone = timeZoneOffsetSb.toString();
 
     return "$year-$month-${day}T$hour:$minutes:${seconds}$timezone";
   }
