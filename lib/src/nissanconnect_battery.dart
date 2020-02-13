@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 enum ChargingSpeed { NONE, SLOW, NORMAL, FAST }
 
 class NissanConnectBattery {
-  NumberFormat numberFormat = NumberFormat('0');
-
   DateTime dateTime;
   ChargingSpeed chargingSpeed;
   bool isConnected = false;
@@ -45,15 +43,15 @@ class NissanConnectBattery {
     this.batteryPercentage =
         NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
     this.cruisingRangeAcOffKm =
-        numberFormat.format(recs['rangeHvacOff'].toDouble()) + ' km';
-    this.cruisingRangeAcOffMiles = numberFormat
-            .format(unitCalculator.toMiles(recs['rangeHvacOff'].toDouble())) +
-        ' mi';
+        unitCalculator.toKilometersPretty(recs['rangeHvacOff'].toDouble()) +
+            ' km';
+    this.cruisingRangeAcOffMiles =
+        unitCalculator.toMilesPretty(recs['rangeHvacOff'].toDouble()) + ' mi';
     this.cruisingRangeAcOnKm =
-        numberFormat.format(recs['rangeHvacOn'].toDouble()) + ' km';
-    this.cruisingRangeAcOnMiles = numberFormat
-            .format(unitCalculator.toMiles(recs['rangeHvacOn'].toDouble())) +
-        ' mi';
+        unitCalculator.toKilometersPretty(recs['rangeHvacOn'].toDouble()) +
+            ' km';
+    this.cruisingRangeAcOnMiles =
+        unitCalculator.toMilesPretty(recs['rangeHvacOn'].toDouble()) + ' mi';
     this.timeToFullSlow = Duration(minutes: recs['timeRequiredToFullSlow']);
     this.timeToFullNormal = Duration(minutes: recs['timeRequiredToFullNormal']);
     this.timeToFullFast = Duration(minutes: recs['timeRequiredToFullFast']);
