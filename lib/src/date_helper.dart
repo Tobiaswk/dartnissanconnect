@@ -33,6 +33,6 @@ String formatDateWithTimeZone(DateTime dateTime) {
     }
   }
 
-  var timezone = timeZoneOffsetSb.toString();
-  return "$year-$month-${day}T$hour:$minutes:${seconds}$timezone";
+  var timeZone = timeZoneOffsetSb.toString();
+  return "$year-$month-${day}T$hour:$minutes:${seconds}$timeZone";
 }
