@@ -71,7 +71,8 @@ class NissanConnectSession {
       String method = 'POST',
       Map additionalHeaders,
       Map params}) async {
-    _print('Invoking NissanConnect API: $endpoint');
+    _print('------------------------------------');
+    _print('Invoking NissanConnect/Kamereon API: $endpoint');
     _print('Params: $params');
 
     Map<String, String> headers = Map();
@@ -103,6 +104,8 @@ class NissanConnectSession {
     } catch (e) {
       _print('JSON decoding failed!');
     }
+
+    _print('------------------------------------');
 
     return NissanConnectResponse(
         response.statusCode, response.headers, jsonData);
