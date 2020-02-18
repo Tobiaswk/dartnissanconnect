@@ -53,7 +53,7 @@ class NissanConnectSession {
 
     if (status != null && status >= 400) {
       _print(
-          'NissanConnect API; logging in and trying request again: $response');
+          'Signing in and trying request again: $response');
 
       await login(username: username, password: password);
 
