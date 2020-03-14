@@ -19,21 +19,24 @@ class NissanConnectStats {
   NissanConnectStats(Map trip) {
     UnitCalculator unitCalculator = UnitCalculator();
 
+    // consumedElectricity is in kilowatt not watt; thus multiply by 1000
+    var consumedElectricity = trip['consumedElectricity']*1000;
+
     this.tripsNumber = trip['tripsNumber'];
     this.milesPerKWh = unitCalculator.milesPerKWhPretty(
-            trip['consumedElectricity'], trip['distance']) +
+            consumedElectricity, trip['distance']) +
         ' mi/kWh';
     this.kWhPerMiles = unitCalculator.kWhPerMilesPretty(
-            trip['consumedElectricity'], trip['distance']) +
+            consumedElectricity, trip['distance']) +
         ' kWh/mi';
     this.kilometersPerKWh = unitCalculator.kilometersPerKWhPretty(
-            trip['consumedElectricity'], trip['distance']) +
+            consumedElectricity, trip['distance']) +
         ' km/kWh';
     this.kWhPerKilometers = unitCalculator.kWhPerKilometersPretty(
-            trip['consumedElectricity'], trip['distance']) +
+            consumedElectricity, trip['distance']) +
         ' kWh/km';
     this.kWhUsed =
-        unitCalculator.WhtoKWhPretty(trip['consumedElectricity']) + ' kWh';
+        unitCalculator.WhtoKWhPretty(consumedElectricity) + ' kWh';
     this.kWhGained =
         unitCalculator.WhtoKWhPretty(trip['savedElectricity']) + ' kWh';
     this.travelDistanceKilometers =
