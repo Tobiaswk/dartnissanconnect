@@ -48,7 +48,7 @@ class NissanConnectVehicle {
   Future<NissanConnectStats> requestMonthlyStatistics({DateTime month}) async {
     var start = DateTime(DateTime.now().year, DateTime.now().month, 1);
     var end = DateTime.now();
-    if (month != null) {
+    if (start.month != month.month) {
       start = DateTime(month.year, month.month, 1);
       end = DateTime(month.year, month.month + 1, 1).subtract(Duration(days: 1));
     }
