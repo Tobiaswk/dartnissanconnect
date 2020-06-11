@@ -45,9 +45,13 @@ class NissanConnectVehicle {
     return NissanConnectBattery(response.body);
   }
 
-  Future<NissanConnectStats> requestMonthlyStatistics() async {
+  Future<NissanConnectStats> requestMonthlyStatistics({DateTime month}) async {
     var start = DateTime(DateTime.now().year, DateTime.now().month, 1);
     var end = DateTime.now();
+    if (month != null) {
+      start = DateTime(month.year, month.month, 1);
+      end = DateTime(month.year, month.month + 1, 1).subtract(Duration(days: 1));
+    }
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.MONTHLY.index}',
