@@ -45,11 +45,11 @@ class UnitCalculator {
   }
 
   averageSpeedMphPretty(double distanceKilometers, int minutes) {
-    return format0((toMiles(distanceKilometers) * 100) / minutes);
+    return format0((toMiles(distanceKilometers) / minutes) * 60);
   }
 
   averageSpeedKmhPretty(double distanceKilometers, int minutes) {
-    return format0((distanceKilometers * 100) / minutes);
+    return format0((distanceKilometers / minutes) * 60);
   }
 
   toMiles(double distanceKilometers) {
