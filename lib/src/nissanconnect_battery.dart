@@ -61,17 +61,17 @@ class NissanConnectBattery {
       case ChargingSpeed.SLOW:
         chargingkWLevelText = 'slow charging';
         chargingRemainingText =
-            '${timeToFullSlow.inHours} hrs ${timeToFullSlow.inMinutes} mins';
+            '${(timeToFullSlow.inMinutes / 60).floor()} hrs ${timeToFullSlow.inMinutes % 60} mins';
         break;
       case ChargingSpeed.NORMAL:
         chargingkWLevelText = 'normal charging';
         chargingRemainingText =
-            '${timeToFullNormal.inHours} hrs ${timeToFullNormal.inMinutes} mins';
+            '${(timeToFullNormal.inMinutes / 60).floor()} hrs ${timeToFullNormal.inMinutes % 60} mins';
         break;
       case ChargingSpeed.FAST:
         chargingkWLevelText = 'fast charging';
         chargingRemainingText =
-            '${timeToFullFast.inHours} hrs ${timeToFullFast.inMinutes} mins';
+            '${(timeToFullFast.inMinutes / 60).floor()} hrs ${timeToFullFast.inMinutes % 60} mins';
         break;
     }
   }
