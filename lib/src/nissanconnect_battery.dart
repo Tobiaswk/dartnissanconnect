@@ -38,7 +38,7 @@ class NissanConnectBattery {
           .toLocal();
     }
     this.chargingSpeed = ChargingSpeed.values[recs['chargePower'] ?? 0];
-    this.isConnected = recs['chargeStatus'] != 0;
+    this.isConnected = recs['plugStatus'] != 0;
     this.isCharging = recs['chargeStatus'] != 0;
     this.batteryPercentage =
         NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
