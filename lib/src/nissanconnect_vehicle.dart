@@ -23,6 +23,7 @@ class NissanConnectVehicle {
   );
 
   Future<bool> requestBatteryStatusRefresh() async {
+    // This actually returns an ID; how to use the ID is not known yet
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-battery-status',
@@ -32,6 +33,10 @@ class NissanConnectVehicle {
         params: {
           'data': {'type': 'RefreshBatteryStatus'}
         });
+
+    // Instead of somehow using the ID returned above we give the battery
+    // status refresh some time to update
+    await Future.delayed(Duration(seconds: 30));
 
     return response.statusCode == 200;
   }
