@@ -55,7 +55,8 @@ class NissanConnectVehicle {
     var end = DateTime.now();
     if (start.month != month.month) {
       start = DateTime(month.year, month.month, 1);
-      end = DateTime(month.year, month.month + 1, 1).subtract(Duration(days: 1));
+      end =
+          DateTime(month.year, month.month + 1, 1).subtract(Duration(days: 1));
     }
     var response = await session.requestWithRetry(
         endpoint:
