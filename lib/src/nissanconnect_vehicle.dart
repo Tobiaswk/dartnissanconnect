@@ -106,9 +106,7 @@ class NissanConnectVehicle {
         params: {
           'data': {
             'type': 'ChargingStart',
-            'attributes': {
-              'action': 'start'
-            }
+            'attributes': {'action': 'start'}
           }
         });
 
@@ -123,7 +121,10 @@ class NissanConnectVehicle {
           'Content-Type': 'application/vnd.api+json'
         },
         params: {
-          'data': {'type': 'ChargingStart', 'attributes': 'stop'}
+          'data': {
+            'type': 'ChargingStart',
+            'attributes': {'action': 'stop'}
+          }
         });
 
     return response.statusCode == 200;
