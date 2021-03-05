@@ -9,8 +9,6 @@ class NissanConnectBattery {
   bool isConnected = false;
   bool isCharging = false;
   String batteryPercentage;
-  String
-      battery12thBar; // Leaf using 12th bar system; present as 12ths; 5/12 etc.
   String cruisingRangeAcOffKm;
   String cruisingRangeAcOffMiles;
   String cruisingRangeAcOnKm;
