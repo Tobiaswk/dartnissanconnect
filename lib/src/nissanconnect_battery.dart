@@ -4,21 +4,21 @@ import 'package:intl/intl.dart';
 enum ChargingSpeed { NONE, SLOW, NORMAL, FAST }
 
 class NissanConnectBattery {
-  DateTime dateTime;
-  ChargingSpeed chargingSpeed;
+  late DateTime dateTime;
+  late ChargingSpeed chargingSpeed;
   bool isConnected = false;
   bool isCharging = false;
-  String batteryPercentage;
-  String cruisingRangeAcOffKm;
-  String cruisingRangeAcOffMiles;
-  String cruisingRangeAcOnKm;
-  String cruisingRangeAcOnMiles;
+  late String batteryPercentage;
+  late String cruisingRangeAcOffKm;
+  late String cruisingRangeAcOffMiles;
+  late String cruisingRangeAcOnKm;
+  late String cruisingRangeAcOnMiles;
 
-  Duration timeToFullSlow;
-  Duration timeToFullNormal;
-  Duration timeToFullFast;
-  String chargingkWLevelText;
-  String chargingRemainingText;
+  late Duration timeToFullSlow;
+  late Duration timeToFullNormal;
+  late Duration timeToFullFast;
+  late String chargingkWLevelText;
+  late String chargingRemainingText;
 
   NissanConnectBattery(Map params) {
     UnitCalculator unitCalculator = UnitCalculator();

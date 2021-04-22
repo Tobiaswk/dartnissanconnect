@@ -2,19 +2,19 @@ import 'package:dartnissanconnect/src/unit_calculator.dart';
 import 'package:intl/intl.dart';
 
 class NissanConnectStats {
-  DateTime date;
-  int tripsNumber;
-  String milesPerKWh;
-  String kilometersPerKWh;
-  String kWhPerMiles;
-  String kWhPerKilometers;
-  String kWhUsed;
-  String kWhGained;
-  String travelDistanceMiles;
-  String travelDistanceKilometers;
-  String travelSpeedAverageMph;
-  String travelSpeedAverageKmh;
-  Duration travelTime;
+  late DateTime date;
+  late int tripsNumber;
+  late String milesPerKWh;
+  late String kilometersPerKWh;
+  late String kWhPerMiles;
+  late String kWhPerKilometers;
+  late String kWhUsed;
+  late String kWhGained;
+  late String travelDistanceMiles;
+  late String travelDistanceKilometers;
+  late String travelSpeedAverageMph;
+  late String travelSpeedAverageKmh;
+  late Duration travelTime;
 
   NissanConnectStats(Map trip) {
     UnitCalculator unitCalculator = UnitCalculator();
@@ -56,7 +56,7 @@ class NissanConnectStats {
 
   static List<NissanConnectStats> list(Map map) {
     var trips = map['data']['attributes']['summaries'];
-    List<NissanConnectStats> result = List();
+    List<NissanConnectStats> result = [];
     for (Map trip in trips) {
       result.add(NissanConnectStats(trip));
     }

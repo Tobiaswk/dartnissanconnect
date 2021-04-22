@@ -30,22 +30,22 @@ class NissanConnectSession {
       'D5AF0E14718E662D12DBB4FE42304DF5A8E48359E22261138B40AA16CC85C76A11B43200A1EECB3C9546A262D1FBD51ACE6FCDE558C00665BBF93FF86B9F8F76AA7A53CA74F5B4DFF9A4B847295E7D82450A2078B5A28814A7A07F8BBDD34F8EEB42B0E70499087A242AA2C5BA9513C8F9D35A81B33A121EEF0A71F3F9071CCD';
 
   bool debug;
-  List<String> debugLog = List<String>();
+  List<String> debugLog = [];
 
   var username;
   var password;
   var bearerToken;
 
-  NissanConnectVehicle vehicle;
-  List<NissanConnectVehicle> vehicles;
+  NissanConnectVehicle? vehicle;
+  List<NissanConnectVehicle> vehicles = [];
 
   NissanConnectSession({this.debug = false});
 
   Future<NissanConnectResponse> requestWithRetry(
-      {String endpoint,
+      {required String endpoint,
       String method = 'POST',
-      Map additionalHeaders,
-      Map params}) async {
+        Map<String, String>? additionalHeaders,
+      Map? params}) async {
     NissanConnectResponse response = await request(
         endpoint: endpoint,
         method: method,
@@ -69,10 +69,10 @@ class NissanConnectSession {
   }
 
   Future<NissanConnectResponse> request(
-      {String endpoint,
+      {required String endpoint,
       String method = 'POST',
-      Map additionalHeaders,
-      Map params}) async {
+      Map<String, String>? additionalHeaders,
+      Map? params}) async {
     _print('Invoking NissanConnect/Kamereon API: $endpoint');
     _print('Params: $params');
 
@@ -91,10 +91,10 @@ class NissanConnectSession {
     http.Response response;
     switch (method) {
       case 'GET':
-        response = await http.get('${endpoint}', headers: headers);
+        response = await http.get(Uri.parse(endpoint), headers: headers);
         break;
       default:
-        response = await http.post('${endpoint}',
+        response = await http.post(Uri.parse(endpoint),
             headers: headers, body: json.encode(params));
     }
 
@@ -110,7 +110,7 @@ class NissanConnectSession {
         response.statusCode, response.headers, jsonData);
   }
 
-  Future<NissanConnectVehicle> login({String username, String password}) async {
+  Future<NissanConnectVehicle> login({required String username, required String password}) async {
     this.username = username;
     this.password = password;
     this.bearerToken = null;
@@ -173,7 +173,7 @@ class NissanConnectSession {
     // Extremely dirty
     // The http client throws an error due to an invalid URI from the API
     // We parse the code used for authentication from the error message
-    String code;
+    String code = "";
     try {
       response = await request(
           endpoint:
@@ -184,13 +184,13 @@ class NissanConnectSession {
           },
           method: 'GET');
       print(response.body);
-    } catch (e) {
+    } on ArgumentError catch(e) {
       code = e.message.split('=')[1].split('&')[0];
     }
 
     response = await request(
       endpoint:
-          '${settings['EU']['auth_base_url']}oauth2${response.body['realm']}/access_token?code=$code&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
+          '${settings['EU']['auth_base_url']}oauth2${response.body['realm']}/access_token?code=${code}&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/x-www-form-urlencoded'
       },
@@ -208,7 +208,7 @@ class NissanConnectSession {
         endpoint: '${settings['EU']['user_base_url']}v2/users/$userId/cars',
         method: 'GET');
 
-    vehicles = List<NissanConnectVehicle>();
+    vehicles = [];
 
     for (Map vehicle in response.body['data']) {
       vehicles.add(NissanConnectVehicle(
