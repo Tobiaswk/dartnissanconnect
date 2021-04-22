@@ -44,7 +44,7 @@ class NissanConnectSession {
   Future<NissanConnectResponse> requestWithRetry(
       {required String endpoint,
       String method = 'POST',
-        Map<String, String>? additionalHeaders,
+      Map<String, String>? additionalHeaders,
       Map? params}) async {
     NissanConnectResponse response = await request(
         endpoint: endpoint,
@@ -110,7 +110,8 @@ class NissanConnectSession {
         response.statusCode, response.headers, jsonData);
   }
 
-  Future<NissanConnectVehicle> login({required String username, required String password}) async {
+  Future<NissanConnectVehicle> login(
+      {required String username, required String password}) async {
     this.username = username;
     this.password = password;
     this.bearerToken = null;
@@ -184,7 +185,7 @@ class NissanConnectSession {
           },
           method: 'GET');
       print(response.body);
-    } on ArgumentError catch(e) {
+    } on ArgumentError catch (e) {
       code = e.message.split('=')[1].split('&')[0];
     }
 

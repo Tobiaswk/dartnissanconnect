@@ -50,7 +50,8 @@ class NissanConnectVehicle {
     return NissanConnectBattery(response.body);
   }
 
-  Future<NissanConnectStats> requestMonthlyStatistics({required DateTime month}) async {
+  Future<NissanConnectStats> requestMonthlyStatistics(
+      {required DateTime month}) async {
     var start = DateTime(DateTime.now().year, DateTime.now().month, 1);
     var end = DateTime.now();
     if (start.month != month.month) {
