@@ -36,7 +36,7 @@ class NissanConnectSession {
   var password;
   var bearerToken;
 
-  NissanConnectVehicle? vehicle;
+  late NissanConnectVehicle vehicle;
   List<NissanConnectVehicle> vehicles = [];
 
   NissanConnectSession({this.debug = false});
