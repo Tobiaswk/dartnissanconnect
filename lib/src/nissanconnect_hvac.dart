@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 class NissanConnectHVAC {
   late bool isRunning;
   late double cabinTemperature;
-  late DateTime climateScheduled;
+  DateTime? climateScheduled;
 
   NissanConnectHVAC(Map params) {
     var hvac = params['data']['attributes'];
