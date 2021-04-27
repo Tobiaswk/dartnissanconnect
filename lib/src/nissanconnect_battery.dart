@@ -17,8 +17,8 @@ class NissanConnectBattery {
   late Duration timeToFullSlow;
   late Duration timeToFullNormal;
   late Duration timeToFullFast;
-  late String chargingkWLevelText;
-  late String chargingRemainingText;
+  String? chargingkWLevelText;
+  String? chargingRemainingText;
 
   NissanConnectBattery(Map params) {
     UnitCalculator unitCalculator = UnitCalculator();
