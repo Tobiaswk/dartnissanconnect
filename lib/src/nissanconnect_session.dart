@@ -52,9 +52,7 @@ class NissanConnectSession {
         additionalHeaders: additionalHeaders,
         params: params);
 
-    var status = response.statusCode;
-
-    if (status != null && status >= 400) {
+    if (response.statusCode >= 400) {
       _print('Signing in and trying request again: $response');
 
       await login(username: username, password: password);
