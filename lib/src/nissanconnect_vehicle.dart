@@ -1,4 +1,5 @@
 import 'package:dartnissanconnect/dartnissanconnect.dart';
+import 'package:dartnissanconnect/src/nissanconnect_lock_status.dart';
 import 'package:dartnissanconnect/src/date_helper.dart';
 import 'package:dartnissanconnect/src/nissanconnect_hvac.dart';
 import 'package:dartnissanconnect/src/nissanconnect_location.dart';
@@ -11,16 +12,20 @@ class NissanConnectVehicle {
   var _targetDateFormatter = DateFormat('yyyy-MM-dd');
 
   NissanConnectSession session;
+  Services services;
   var vin;
   var modelName;
   var nickname;
 
   NissanConnectVehicle(
     this.session,
+    this.services,
     this.vin,
     this.modelName,
     this.nickname,
   );
+
+  hasFeature(int id) => services.hasFeature(id);
 
   Future<bool> requestBatteryStatusRefresh() async {
     // This actually returns an ID; how to use the ID is not known yet
@@ -250,5 +255,160 @@ class NissanConnectVehicle {
         method: 'GET');
 
     return NissanConnectLocation(response.body['data']['attributes']);
+  }
+
+  Future<bool> requestHorn({bool on = true, int? duration = 2}) async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/horn-lights',
+        additionalHeaders: <String, String>{
+          'Content-Type': 'application/vnd.api+json'
+        },
+        params: {
+          'data': {
+            'type': 'HornLights',
+            'attributes': {
+              'action': _hornAndLightsAction(on: on),
+              'duration': duration,
+              'target': 'horn'
+            }
+          }
+        });
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestLights({bool on = true, int? duration = 2}) async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/horn-lights',
+        additionalHeaders: <String, String>{
+          'Content-Type': 'application/vnd.api+json'
+        },
+        params: {
+          'data': {
+            'type': 'HornLights',
+            'attributes': {
+              'action': _hornAndLightsAction(on: on),
+              'duration': duration,
+              'target': 'lights'
+            }
+          }
+        });
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestHornAndLights({bool on = true, int? duration = 2}) async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/horn-lights',
+        additionalHeaders: <String, String>{
+          'Content-Type': 'application/vnd.api+json'
+        },
+        params: {
+          'data': {
+            'type': 'HornLights',
+            'attributes': {
+              'action': _hornAndLightsAction(on: on),
+              'duration': duration,
+              'target': 'horn_lights'
+            }
+          }
+        });
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> requestLockUnlock(
+      {bool lock = true, bool onlyDoors = false}) async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/lock-unlock',
+        additionalHeaders: <String, String>{
+          'Content-Type': 'application/vnd.api+json'
+        },
+        params: {
+          'data': {
+            'type': 'LockUnlock',
+            'attributes': {
+              'lock': '${lock ? 'lock' : 'unlock'}',
+              'doorType': '${onlyDoors ? 'driver_s_door' : 'doors_hatch'}',
+              'srp': ''
+            }
+          }
+        });
+
+    return response.statusCode == 200;
+  }
+
+  Future<NissanConnectLockStatus> requestLockStatus() async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/lock-status',
+        method: 'GET');
+
+    return NissanConnectLockStatus(response.body);
+  }
+
+  Future<String> _requestUserId() async {
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['user_adapter_base_url']}v1/users/current',
+        method: 'GET');
+
+    return response.body['userId'];
+  }
+
+  String _hornAndLightsAction({required bool on}) {
+    return '${on ? 'start' : 'stop'}';
+  }
+
+  // Needs implementation
+  _initiateSrp() async {
+    var userId = await _requestUserId();
+
+    // salt = 20 hex chars, verifier = 512 hex chars
+    var salt = '0' * 20;
+    var verifier = 'ABCDEFGH' * 50;
+
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/srp-initiates',
+        params: {
+          'data': {
+            'type': 'SrpInitiates',
+            'attributes': {
+              's': salt,
+              'i': userId,
+              'v': verifier,
+            }
+          }
+        });
+
+    return response.body;
+  }
+
+  // Needs implementation
+  _validateSrp() async {
+    var userId = await _requestUserId();
+
+    // 512 hex chars
+    var a = '';
+
+    var response = await session.requestWithRetry(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/srp-sets',
+        params: {
+          'data': {
+            'type': 'SrpSets',
+            'attributes': {
+              'i': userId,
+              'a': a,
+            }
+          }
+        });
+
+    return response.body;
   }
 }
