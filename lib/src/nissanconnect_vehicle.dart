@@ -25,7 +25,7 @@ class NissanConnectVehicle {
     this.nickname,
   );
 
-  hasFeature(int id) => services.hasFeature(id);
+  hasService(int id) => services.hasService(id);
 
   Future<bool> requestBatteryStatusRefresh() async {
     // This actually returns an ID; how to use the ID is not known yet

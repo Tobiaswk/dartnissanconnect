@@ -98,7 +98,7 @@ class Services {
 
   Services(this._services);
 
-  bool hasFeature(int id) => _services.any((service) =>
+  bool hasService(int id) => _services.any((service) =>
       service['id'] == id && service['activationState'] == 'ACTIVATED');
 }
 
