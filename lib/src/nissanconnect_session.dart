@@ -302,7 +302,7 @@ class NissanConnectSession {
     var userId = response.body['userId'];
 
     response = await request(
-        endpoint: '${settings['EU']['user_base_url']}v2/users/$userId/cars',
+        endpoint: '${settings['EU']['user_base_url']}v4/users/$userId/cars',
         method: 'GET');
 
     vehicles = [];
