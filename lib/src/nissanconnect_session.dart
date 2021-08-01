@@ -1,7 +1,8 @@
-import 'package:dartnissanconnect/src/nissanconnect_response.dart';
-import 'package:dartnissanconnect/src/nissanconnect_vehicle.dart';
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:dartnissanconnect/src/nissanconnect_response.dart';
+import 'package:dartnissanconnect/src/nissanconnect_vehicle.dart';
 import 'package:http/http.dart' as http;
 
 class Services {
@@ -228,42 +229,50 @@ class NissanConnectSession {
 
     var authId = response.body['authId'];
 
-    response = await request(
-        endpoint:
-            '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
-        additionalHeaders: <String, String>{
-          'Accept-Api-Version': API_VERSION,
-          'X-Username': 'anonymous',
-          'X-Password': 'anonymous',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        params: {
-          'authId': authId,
-          'template': '',
-          'stage': 'LDAP1',
-          'header': 'Sign in',
-          'callbacks': [
-            {
-              'type': 'NameCallback',
-              'output': [
-                {'name': 'prompt', 'value': 'User Name:'}
-              ],
-              'input': [
-                {'name': 'IDToken1', 'value': username}
-              ]
-            },
-            {
-              'type': 'PasswordCallback',
-              'output': [
-                {'name': 'prompt', 'value': 'Password:'}
-              ],
-              'input': [
-                {'name': 'IDToken2', 'value': password}
-              ]
-            }
-          ]
-        });
+    /// For some reason this request can sometimes fail with the error;
+    ///   code: 401, reason: Unauthorized, message: Session has timed out, detail: {errorCode: 110}
+    /// Therefore we retry this request if it fails; a maximum of 10 retries
+    /// A real solution should be investigated
+    var retries = 10;
+    do {
+      response = await request(
+          endpoint:
+              '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
+          additionalHeaders: <String, String>{
+            'Accept-Api-Version': API_VERSION,
+            'X-Username': 'anonymous',
+            'X-Password': 'anonymous',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          params: {
+            'authId': authId,
+            'template': '',
+            'stage': 'LDAP1',
+            'header': 'Sign in',
+            'callbacks': [
+              {
+                'type': 'NameCallback',
+                'output': [
+                  {'name': 'prompt', 'value': 'User Name:'}
+                ],
+                'input': [
+                  {'name': 'IDToken1', 'value': username}
+                ]
+              },
+              {
+                'type': 'PasswordCallback',
+                'output': [
+                  {'name': 'prompt', 'value': 'Password:'}
+                ],
+                'input': [
+                  {'name': 'IDToken2', 'value': password}
+                ]
+              }
+            ]
+          });
+      _print('Authenticating (retries left: $retries)');
+    } while (response.statusCode == 401 && retries-- > 0);
 
     var authCookie = response.body['tokenId'];
 
