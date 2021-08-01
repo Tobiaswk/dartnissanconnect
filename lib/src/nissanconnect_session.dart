@@ -213,9 +213,9 @@ class NissanConnectSession {
     this.password = password;
     this.bearerToken = null;
 
-    // The Referer to this POST; https://prod.eu.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&goto=https://prod.eu.auth.kamereon.org/kauth/oauth2/a-ncb-prod/authorize?client_id=a-ncb-prod-android&redirect_uri=org.kamereon.service.nci%3A%2Foauth2redirect&response_type=code&scope=openid%20profile%20vehicles&state=af0ifjsldkj&nonce=sdfdsfez
-    // This Referer opens in a web view when you try to login with the official app
-    // We first get the authId used in the next POST (which is fetched automatically in web view using the above Referer)
+    /// The Referer to this POST; https://prod.eu.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&goto=https://prod.eu.auth.kamereon.org/kauth/oauth2/a-ncb-prod/authorize?client_id=a-ncb-prod-android&redirect_uri=org.kamereon.service.nci%3A%2Foauth2redirect&response_type=code&scope=openid%20profile%20vehicles&state=af0ifjsldkj&nonce=sdfdsfez
+    /// This Referer opens in a web view when you try to login with the official app
+    /// We first get the authId used in the next POST (which is fetched automatically in web view using the above Referer)
     NissanConnectResponse response = await request(
         endpoint:
             '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
@@ -276,9 +276,9 @@ class NissanConnectSession {
 
     var authCookie = response.body['tokenId'];
 
-    // Extremely dirty
-    // The http client throws an error due to an invalid URI from the API
-    // We parse the code used for authentication from the error message
+    /// Extremely dirty
+    /// The http client throws an error due to an invalid URI from the API
+    /// We parse the code used for authentication from the error message
     String code = "";
     try {
       response = await request(
