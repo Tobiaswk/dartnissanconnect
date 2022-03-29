@@ -106,14 +106,14 @@ class Services {
 class NissanConnectSession {
   Map settings = <String, Map>{
     'EU': <String, String>{
-      'client_id': 'a-ncb-prod-android', // CLIENT_ID_V2_EU_PROD
+      'client_id': 'a-ncb-prod-android', // CLIENT_ID_V2_EU_PROD_NEW
       'client_secret':
-          '0sAcrtwvwEXXZp5nzQhPexSRhxUVKa0d76F4uqDvxvvKFHXpo4myoJwUuV4vuNqC', // CLIENT_SECRET_V2_EU_PROD
-      'scope': 'openid profile vehicles', // API_SCOPE_V2_EU_PROD
+          '0sAcrtwvwEXXZp5nzQhPexSRhxUVKa0d76F4uqDvxvvKFHXpo4myoJwUuV4vuNqC', // CLIENT_SECRET_V2_EU_PROD_NEW
+      'scope': 'openid profile vehicles', // API_SCOPE_V2_EU_PROD_NEW
       'auth_base_url':
-          'https://prod.eu2.auth.kamereon.org/kauth/', // OAUTH_AUTHORIZATION_BASE_URL_V2_EU_PROD
+          'https://prod.eu2.auth.kamereon.org/kauth/', // OAUTH_AUTHORIZATION_BASE_URL_V2_EU_PROD_NEW
       'realm':
-          'a-ncb-prod', // OAUTH_REALM_DEFAULT_V2_EU_PROD CLIENT_ID_V2_EU_PROD
+          'a-ncb-prod', // OAUTH_REALM_DEFAULT_V2_EU_PROD_NEW CLIENT_ID_V2_EU_PROD_NEW
       'redirect_uri': 'org.kamereon.service.nci:/oauth2redirect',
       'car_adapter_base_url': // carAdapter_eu_prod
           'https://alliance-platform-caradapter-prod.apps.eu2.kamereon.io/car-adapter/',
