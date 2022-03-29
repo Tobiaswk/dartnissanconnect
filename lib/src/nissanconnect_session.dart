@@ -108,17 +108,17 @@ class NissanConnectSession {
     'EU': <String, String>{
       'client_id': 'a-ncb-prod-android', // CLIENT_ID_V2_EU_PROD
       'client_secret':
-          '3LBs0yOx2XO-3m4mMRW27rKeJzskhfWF0A8KUtnim8i/qYQPl8ZItp3IaqJXaYj_', // CLIENT_SECRET_V2_EU_PROD
+          '0sAcrtwvwEXXZp5nzQhPexSRhxUVKa0d76F4uqDvxvvKFHXpo4myoJwUuV4vuNqC', // CLIENT_SECRET_V2_EU_PROD
       'scope': 'openid profile vehicles', // API_SCOPE_V2_EU_PROD
       'auth_base_url':
-          'https://prod.eu.auth.kamereon.org/kauth/', // OAUTH_AUTHORIZATION_BASE_URL_V2_EU_PROD
+          'https://prod.eu2.auth.kamereon.org/kauth/', // OAUTH_AUTHORIZATION_BASE_URL_V2_EU_PROD
       'realm':
           'a-ncb-prod', // OAUTH_REALM_DEFAULT_V2_EU_PROD CLIENT_ID_V2_EU_PROD
       'redirect_uri': 'org.kamereon.service.nci:/oauth2redirect',
       'car_adapter_base_url': // carAdapter_eu_prod
-          'https://alliance-platform-caradapter-prod.apps.eu.kamereon.io/car-adapter/',
+          'https://alliance-platform-caradapter-prod.apps.eu2.kamereon.io/car-adapter/',
       'user_adapter_base_url': // userAdapter_eu_prod
-          'https://alliance-platform-usersadapter-prod.apps.eu.kamereon.io/user-adapter/',
+          'https://alliance-platform-usersadapter-prod.apps.eu2.kamereon.io/user-adapter/',
       'user_base_url':
           'https://nci-bff-web-prod.apps.eu.kamereon.io/bff-web/' // bffWeb_eu_prod
     }
