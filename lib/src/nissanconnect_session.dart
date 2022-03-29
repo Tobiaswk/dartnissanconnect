@@ -213,7 +213,7 @@ class NissanConnectSession {
     this.password = password;
     this.bearerToken = null;
 
-    /// The Referer to this POST; https://prod.eu.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&goto=https://prod.eu.auth.kamereon.org/kauth/oauth2/a-ncb-prod/authorize?client_id=a-ncb-prod-android&redirect_uri=org.kamereon.service.nci%3A%2Foauth2redirect&response_type=code&scope=openid%20profile%20vehicles&state=af0ifjsldkj&nonce=sdfdsfez
+    /// The Referer to this POST; https://prod.eu2.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&goto=https://prod.eu2.auth.kamereon.org/kauth/oauth2/a-ncb-prod/authorize?client_id=a-ncb-prod-android&redirect_uri=org.kamereon.service.nci:/oauth2redirect&response_type=code&scope=openid%20profile%20vehicles&state=af0ifjsldkj&nonce=sdfdsfez
     /// This Referer opens in a web view when you try to login with the official app
     /// We first get the authId used in the next POST (which is fetched automatically in web view using the above Referer)
     NissanConnectResponse response = await request(
