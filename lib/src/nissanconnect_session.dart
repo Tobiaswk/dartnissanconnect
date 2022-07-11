@@ -229,7 +229,7 @@ class NissanConnectSession {
 
     var authId = response.body['authId'];
 
-    /// For some reason this request can sometimes fail with the error;
+    /// For some reason this request can sometimes fail giving a HTTP status code 401;
     ///   code: 401, reason: Unauthorized, message: Session has timed out, detail: {errorCode: 110}
     /// Therefore we retry this request if it fails; a maximum of 10 retries
     /// A real solution should be investigated
