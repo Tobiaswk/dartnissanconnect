@@ -120,7 +120,7 @@ class NissanConnectSession {
       'user_adapter_base_url': // userAdapter_eu_prod
           'https://alliance-platform-usersadapter-prod.apps.eu2.kamereon.io/user-adapter/',
       'user_base_url':
-          'https://nci-bff-web-prod.apps.eu.kamereon.io/bff-web/' // bffWeb_eu_prod
+          'https://nci-bff-web-prod.apps.eu2.kamereon.io/bff-web/' // bffWeb_eu_prod
     }
   };
 
@@ -283,7 +283,7 @@ class NissanConnectSession {
     try {
       response = await request(
           endpoint:
-              '${settings['EU']['auth_base_url']}oauth2${response.body['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez',
+              '${settings['EU']['auth_base_url']}oauth2${response.body['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez&state=af0ifjsldkj',
           additionalHeaders: <String, String>{
             'Cookie':
                 'i18next=en-UK; amlbcookie=05; kauthSession=\"$authCookie\"'
@@ -311,7 +311,7 @@ class NissanConnectSession {
     var userId = response.body['userId'];
 
     response = await request(
-        endpoint: '${settings['EU']['user_base_url']}v4/users/$userId/cars',
+        endpoint: '${settings['EU']['user_base_url']}v5/users/$userId/cars',
         method: 'GET');
 
     vehicles = [];
