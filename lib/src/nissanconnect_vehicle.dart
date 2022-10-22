@@ -1,8 +1,8 @@
 import 'package:dartnissanconnect/dartnissanconnect.dart';
-import 'package:dartnissanconnect/src/nissanconnect_lock_status.dart';
 import 'package:dartnissanconnect/src/date_helper.dart';
 import 'package:dartnissanconnect/src/nissanconnect_hvac.dart';
 import 'package:dartnissanconnect/src/nissanconnect_location.dart';
+import 'package:dartnissanconnect/src/nissanconnect_lock_status.dart';
 import 'package:dartnissanconnect/src/nissanconnect_stats.dart';
 import 'package:intl/intl.dart';
 
@@ -13,9 +13,9 @@ class NissanConnectVehicle {
 
   NissanConnectSession session;
   Services services;
-  var vin;
-  var modelName;
-  var nickname;
+  String vin;
+  String modelName;
+  String nickname;
 
   NissanConnectVehicle(
     this.session,
@@ -28,7 +28,7 @@ class NissanConnectVehicle {
   hasService(int id) => services.hasService(id);
 
   Future<bool> requestBatteryStatusRefresh() async {
-    // This actually returns an ID; how to use the ID is not known yet
+    // This actually returns an unique id; how to use the id is not known yet
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-battery-status',
@@ -39,8 +39,8 @@ class NissanConnectVehicle {
           'data': {'type': 'RefreshBatteryStatus'}
         });
 
-    // Instead of somehow using the ID returned above we give the battery
-    // status refresh some time to update
+    /// Instead of somehow using the id returned above we give the battery
+    /// status refresh some time to update.
     await Future.delayed(Duration(seconds: 30));
 
     return response.statusCode == 200;

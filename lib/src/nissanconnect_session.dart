@@ -95,7 +95,7 @@ class Services {
   static final int VALET_PARKING_CALL = 401;
   static final int PANIC_CALL = 406;
 
-  var _services;
+  List _services;
 
   Services(this._services);
 
