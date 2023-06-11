@@ -1,7 +1,7 @@
 import 'package:dartnissanconnect/src/unit_calculator.dart';
 import 'package:intl/intl.dart';
 
-enum ChargingSpeed { NONE, SLOW, NORMAL, FAST }
+enum ChargingSpeed { NONE, SLOW, NORMAL, FAST, FASTEST }
 
 class NissanConnectBattery {
   late DateTime dateTime;
@@ -67,6 +67,7 @@ class NissanConnectBattery {
             '${timeToFullNormal.inHours} hrs ${timeToFullNormal.inMinutes % 60} mins';
         break;
       case ChargingSpeed.FAST:
+      case ChargingSpeed.FASTEST:
         chargingkWLevelText = 'fast charging';
         chargingRemainingText =
             '${timeToFullFast.inHours} hrs ${timeToFullFast.inMinutes % 60} mins';
