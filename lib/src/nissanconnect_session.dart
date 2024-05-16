@@ -106,9 +106,9 @@ class Services {
 class NissanConnectSession {
   Map settings = <String, Map>{
     'EU': <String, String>{
-      'client_id': 'a-ncb-prod-android', // CLIENT_ID_V2_EU_PROD_NEW
+      'client_id': 'a-ncb-nc-android-prod', // CLIENT_ID_V2_EU_PROD_NEW
       'client_secret':
-          '0sAcrtwvwEXXZp5nzQhPexSRhxUVKa0d76F4uqDvxvvKFHXpo4myoJwUuV4vuNqC', // CLIENT_SECRET_V2_EU_PROD_NEW
+          '6GKIax7fGT5yPHuNmWNVOc4q5POBw1WRSW39ubRA8WPBmQ7MOxhm75EsmKMKENem', // CLIENT_SECRET_V2_EU_PROD_NEW
       'scope': 'openid profile vehicles', // API_SCOPE_V2_EU_PROD_NEW
       'auth_base_url':
           'https://prod.eu2.auth.kamereon.org/kauth/', // OAUTH_AUTHORIZATION_BASE_URL_V2_EU_PROD_NEW
@@ -213,7 +213,7 @@ class NissanConnectSession {
     this.password = password;
     this.bearerToken = null;
 
-    /// The Referer to this POST; https://prod.eu2.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&goto=https://prod.eu2.auth.kamereon.org/kauth/oauth2/a-ncb-prod/authorize?client_id=a-ncb-prod-android&redirect_uri=org.kamereon.service.nci:/oauth2redirect&response_type=code&scope=openid%20profile%20vehicles&state=af0ifjsldkj&nonce=sdfdsfez
+    /// The Referer to this POST; https://prod.eu2.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&locale=da&authIndexType=service&authIndexValue=nissan&goto=https://prod.eu2.auth.kamereon.org:443/kauth/oauth2/a-ncb-prod/authorize?client_id%3Da-ncb-nc-android-prod%26redirect_uri%3Dorg.kamereon.service.nci:/oauth2redirect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520vehicles%26state%3Daf0ifjsldkj%26nonce%3Dsdfdsfez%26locale%3Dda%26acr_values%3Dnissan
     /// This Referer opens in a web view when you try to login with the official app
     /// We first get the authId used in the next POST (which is fetched automatically in web view using the above Referer)
     NissanConnectResponse response = await request(
