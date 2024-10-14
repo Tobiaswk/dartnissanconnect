@@ -20,10 +20,60 @@ class NissanConnectBattery {
   String? chargingkWLevelText;
   String? chargingRemainingText;
 
-  NissanConnectBattery(Map params) {
+  NissanConnectBattery.ariya(Map params) {
     UnitCalculator unitCalculator = UnitCalculator();
 
     var recs = params['data']['attributes'];
+
+    // For reasons unknown the lastUpdateTime sometimes includes
+    // seconds and sometimes not
+    try {
+      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+          .parse(recs['lastUpdateTime'], true)
+          .toLocal();
+    } catch (e) {
+      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+          .parse(recs['lastUpdateTime'], true)
+          .toLocal();
+    }
+    this.chargingSpeed = ChargingSpeed.NONE;
+    this.isConnected = recs['plugStatus'] != 0;
+    this.isCharging = isConnected && recs['chargeStatus'] > 0;
+    this.batteryPercentage =
+        NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
+    this.cruisingRangeAcOffKm =
+        unitCalculator.toKilometersPretty(recs['batteryAutonomy'].toDouble()) +
+            ' km';
+    this.cruisingRangeAcOffMiles =
+        unitCalculator.toMilesPretty(recs['batteryAutonomy'].toDouble()) +
+            ' mi';
+    this.cruisingRangeAcOnKm =
+        unitCalculator.toKilometersPretty(recs['batteryAutonomy'].toDouble()) +
+            ' km';
+    this.cruisingRangeAcOnMiles =
+        unitCalculator.toMilesPretty(recs['batteryAutonomy'].toDouble()) +
+            ' mi';
+    this.timeToFullSlow = Duration(minutes: recs['chargingRemainingTime']);
+    this.timeToFullNormal = Duration(minutes: recs['chargingRemainingTime']);
+    this.timeToFullFast = Duration(minutes: recs['chargingRemainingTime']);
+    switch (this.chargingSpeed) {
+      case ChargingSpeed.SLOW:
+      case ChargingSpeed.NORMAL:
+      case ChargingSpeed.FAST:
+      case ChargingSpeed.FASTEST:
+      case ChargingSpeed.NONE:
+        chargingkWLevelText = 'charging';
+        chargingRemainingText =
+            '${timeToFullSlow.inHours} hrs ${timeToFullSlow.inMinutes % 60} mins';
+        break;
+    }
+  }
+
+  NissanConnectBattery.leaf(Map params) {
+    UnitCalculator unitCalculator = UnitCalculator();
+
+    var recs = params['data']['attributes'];
+
     // For reasons unknown the lastUpdateTime sometimes includes
     // seconds and sometimes not
     try {

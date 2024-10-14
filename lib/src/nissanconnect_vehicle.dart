@@ -1,12 +1,12 @@
 import 'package:dartnissanconnect/dartnissanconnect.dart';
 import 'package:dartnissanconnect/src/date_helper.dart';
 import 'package:dartnissanconnect/src/nissanconnect_hvac.dart';
-import 'package:dartnissanconnect/src/nissanconnect_location.dart';
 import 'package:dartnissanconnect/src/nissanconnect_lock_status.dart';
-import 'package:dartnissanconnect/src/nissanconnect_stats.dart';
 import 'package:intl/intl.dart';
 
-enum Period { DAILY, MONTHLY, YEARLY }
+enum NissanConnectPeriod { DAILY, MONTHLY, YEARLY }
+
+enum NissanConnectVehicleType { leaf, ariya, other }
 
 class NissanConnectVehicle {
   var _targetDateFormatter = DateFormat('yyyy-MM-dd');
@@ -16,6 +16,7 @@ class NissanConnectVehicle {
   String vin;
   String modelName;
   String nickname;
+  String canGeneration;
 
   NissanConnectVehicle(
     this.session,
@@ -23,12 +24,18 @@ class NissanConnectVehicle {
     this.vin,
     this.modelName,
     this.nickname,
+    this.canGeneration,
   );
 
   hasService(int id) => services.hasService(id);
 
+  NissanConnectVehicleType get type => switch (modelName) {
+        'Ariya' => NissanConnectVehicleType.ariya,
+        'Leaf' => NissanConnectVehicleType.leaf,
+        _ => NissanConnectVehicleType.other,
+      };
+
   Future<bool> requestBatteryStatusRefresh() async {
-    // This actually returns an unique id; how to use the id is not known yet
     var response = await session.requestWithRetry(
         endpoint:
             '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-battery-status',
@@ -39,20 +46,25 @@ class NissanConnectVehicle {
           'data': {'type': 'RefreshBatteryStatus'}
         });
 
-    /// Instead of somehow using the id returned above we give the battery
-    /// status refresh some time to update.
-    await Future.delayed(Duration(seconds: 30));
-
-    return response.statusCode == 200;
+    return _actionIsCompletedPoll(actionId: response.body['data']['id']);
   }
 
   Future<NissanConnectBattery> requestBatteryStatus() async {
-    var response = await session.requestWithRetry(
-        endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/battery-status',
-        method: 'GET');
-
-    return NissanConnectBattery(response.body);
+    switch (type) {
+      case NissanConnectVehicleType.other:
+      case NissanConnectVehicleType.leaf:
+        return NissanConnectBattery.leaf((await session.requestWithRetry(
+                endpoint:
+                    '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/battery-status',
+                method: 'GET'))
+            .body);
+      case NissanConnectVehicleType.ariya:
+        return NissanConnectBattery.ariya((await session.requestWithRetry(
+                endpoint:
+                    '${session.settings['EU']['user_base_url']}v3/cars/$vin/battery-status?canGen=$canGeneration',
+                method: 'GET'))
+            .body);
+    }
   }
 
   Future<NissanConnectStats> requestMonthlyStatistics(
@@ -66,7 +78,7 @@ class NissanConnectVehicle {
     }
     var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.MONTHLY.index}',
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.MONTHLY.index}',
         method: 'GET');
     return NissanConnectStats(
         response.body['data']['attributes']['summaries'].last);
@@ -77,7 +89,7 @@ class NissanConnectVehicle {
     var end = start;
     var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.DAILY.index}',
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.DAILY.index}',
         method: 'GET');
     return NissanConnectStats(
         response.body['data']['attributes']['summaries'].last);
@@ -97,7 +109,7 @@ class NissanConnectVehicle {
     }
     var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${Period.DAILY.index}',
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.DAILY.index}',
         method: 'GET');
     return NissanConnectStats.list(response.body);
   }
@@ -410,5 +422,26 @@ class NissanConnectVehicle {
         });
 
     return response.body;
+  }
+
+  Future<bool> _actionIsCompletedPoll({required String actionId}) async {
+    int pollRetries = 8;
+
+    while (pollRetries-- > 0) {
+      var response = await session.request(
+        endpoint:
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/status?actionId=$actionId',
+        method: 'GET',
+      );
+
+      if (response.statusCode == 200 &&
+          response.body['data']?['attributes']?['status']?.toUpperCase() ==
+              'COMPLETED') return true;
+
+      /// We wait 15 seconds before polling action status again
+      await Future.delayed(Duration(seconds: 15));
+    }
+
+    return false;
   }
 }

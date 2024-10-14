@@ -131,9 +131,11 @@ class NissanConnectSession {
   bool debug;
   List<String> debugLog = [];
 
-  var username;
-  var password;
-  var bearerToken;
+  late String username;
+  late String password;
+  String? bearerToken;
+
+  late String userId;
 
   late NissanConnectVehicle vehicle;
   late List<NissanConnectVehicle> vehicles;
@@ -308,7 +310,7 @@ class NissanConnectSession {
         endpoint: '${settings['EU']['user_adapter_base_url']}v1/users/current',
         method: 'GET');
 
-    var userId = response.body['userId'];
+    userId = response.body['userId'];
 
     response = await request(
         endpoint: '${settings['EU']['user_base_url']}v5/users/$userId/cars',
@@ -318,12 +320,13 @@ class NissanConnectSession {
 
     for (Map vehicle in response.body['data']) {
       vehicles.add(NissanConnectVehicle(
-          this,
-          Services(vehicle['services'] ?? []),
-          vehicle['vin'],
-          vehicle['modelName'],
-          vehicle['nickname'] ??
-              '${vehicle['modelName']} ${vehicles.length + 1}'));
+        this,
+        Services(vehicle['services'] ?? []),
+        vehicle['vin'],
+        vehicle['modelName'],
+        vehicle['nickname'] ?? '${vehicle['modelName']} ${vehicles.length + 1}',
+        vehicle['canGeneration'],
+      ));
     }
 
     return vehicle = vehicles.first;
