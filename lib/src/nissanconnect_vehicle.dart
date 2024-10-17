@@ -4,7 +4,7 @@ import 'package:dartnissanconnect/src/nissanconnect_hvac.dart';
 import 'package:dartnissanconnect/src/nissanconnect_lock_status.dart';
 import 'package:intl/intl.dart';
 
-enum NissanConnectPeriod { DAILY, MONTHLY, YEARLY }
+enum NissanConnectPeriod { daily, monthly, yearly }
 
 enum NissanConnectVehicleType { leaf, ariya, other }
 
@@ -78,7 +78,7 @@ class NissanConnectVehicle {
     }
     var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.MONTHLY.index}',
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.monthly.index}',
         method: 'GET');
     return NissanConnectStats(
         response.body['data']['attributes']['summaries'].last);
@@ -89,7 +89,7 @@ class NissanConnectVehicle {
     var end = start;
     var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.DAILY.index}',
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.daily.index}',
         method: 'GET');
     return NissanConnectStats(
         response.body['data']['attributes']['summaries'].last);
@@ -109,7 +109,7 @@ class NissanConnectVehicle {
     }
     var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.DAILY.index}',
+            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.daily.index}',
         method: 'GET');
     return NissanConnectStats.list(response.body);
   }
