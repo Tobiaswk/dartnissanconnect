@@ -14,9 +14,9 @@ class NissanConnectBattery {
   late String cruisingRangeAcOnKm;
   late String cruisingRangeAcOnMiles;
 
-  late Duration timeToFullSlow;
-  late Duration timeToFullNormal;
-  late Duration timeToFullFast;
+  Duration? timeToFullSlow;
+  Duration? timeToFullNormal;
+  Duration? timeToFullFast;
   String? chargingkWLevelText;
   String? chargingRemainingText;
 
@@ -53,8 +53,6 @@ class NissanConnectBattery {
     this.cruisingRangeAcOnMiles =
         unitCalculator.toMilesPretty(recs['batteryAutonomy'].toDouble()) +
             ' mi';
-    this.timeToFullSlow = Duration(minutes: recs['chargingRemainingTime']);
-    this.timeToFullNormal = Duration(minutes: recs['chargingRemainingTime']);
     this.timeToFullFast = Duration(minutes: recs['chargingRemainingTime']);
     switch (this.chargingSpeed) {
       case ChargingSpeed.SLOW:
@@ -64,7 +62,7 @@ class NissanConnectBattery {
       case ChargingSpeed.NONE:
         chargingkWLevelText = 'charging';
         chargingRemainingText =
-            '${timeToFullSlow.inHours} hrs ${timeToFullSlow.inMinutes % 60} mins';
+            '${timeToFullFast!.inHours} hrs ${timeToFullFast!.inMinutes % 60} mins';
         break;
     }
   }
@@ -109,18 +107,18 @@ class NissanConnectBattery {
       case ChargingSpeed.SLOW:
         chargingkWLevelText = 'slow charging';
         chargingRemainingText =
-            '${timeToFullSlow.inHours} hrs ${timeToFullSlow.inMinutes % 60} mins';
+            '${timeToFullSlow!.inHours} hrs ${timeToFullSlow!.inMinutes % 60} mins';
         break;
       case ChargingSpeed.NORMAL:
         chargingkWLevelText = 'normal charging';
         chargingRemainingText =
-            '${timeToFullNormal.inHours} hrs ${timeToFullNormal.inMinutes % 60} mins';
+            '${timeToFullNormal!.inHours} hrs ${timeToFullNormal!.inMinutes % 60} mins';
         break;
       case ChargingSpeed.FAST:
       case ChargingSpeed.FASTEST:
         chargingkWLevelText = 'fast charging';
         chargingRemainingText =
-            '${timeToFullFast.inHours} hrs ${timeToFullFast.inMinutes % 60} mins';
+            '${timeToFullFast!.inHours} hrs ${timeToFullFast!.inMinutes % 60} mins';
         break;
     }
   }
