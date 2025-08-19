@@ -285,7 +285,7 @@ class NissanConnectSession {
     try {
       response = await request(
           endpoint:
-              '${settings['EU']['auth_base_url']}oauth2${response.body['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez&state=af0ifjsldkj',
+              '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez&state=af0ifjsldkj',
           additionalHeaders: <String, String>{
             'Cookie':
                 'i18next=en-UK; amlbcookie=05; kauthSession=\"$authCookie\"'
@@ -298,7 +298,7 @@ class NissanConnectSession {
 
     response = await request(
       endpoint:
-          '${settings['EU']['auth_base_url']}oauth2${response.body['realm']}/access_token?code=${code}&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
+          '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/access_token?code=${code}&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/x-www-form-urlencoded'
       },
