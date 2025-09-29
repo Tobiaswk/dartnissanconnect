@@ -437,6 +437,11 @@ class NissanConnectVehicle {
       if (response.statusCode == 200 &&
           response.body['data']?['attributes']?['status']?.toUpperCase() ==
               'COMPLETED') return true;
+      final status = response.body['data']?['attributes']?['status']
+          ?.toLowerCase();
+
+      if (response.statusCode == 200 && status == 'completed') return true;
+      if (response.statusCode == 200 && status == 'cancelled') return false;
 
       /// We wait 15 seconds before polling action status again
       await Future.delayed(Duration(seconds: 15));
