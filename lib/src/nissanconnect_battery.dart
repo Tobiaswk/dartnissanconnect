@@ -8,7 +8,8 @@ class NissanConnectBattery {
   late ChargingSpeed chargingSpeed;
   bool isConnected = false;
   bool isCharging = false;
-  late String batteryPercentage;
+  late int batteryPercentage;
+  late String batteryPercentageText;
   late String cruisingRangeAcOffKm;
   late String cruisingRangeAcOffMiles;
   late String cruisingRangeAcOnKm;
@@ -28,31 +29,32 @@ class NissanConnectBattery {
     // For reasons unknown the lastUpdateTime sometimes includes
     // seconds and sometimes not
     try {
-      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-          .parse(recs['lastUpdateTime'], true)
-          .toLocal();
+      this.dateTime = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+      ).parse(recs['lastUpdateTime'], true).toLocal();
     } catch (e) {
-      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-          .parse(recs['lastUpdateTime'], true)
-          .toLocal();
+      this.dateTime = DateFormat(
+        "yyyy-MM-dd'T'HH:mm'Z'",
+      ).parse(recs['lastUpdateTime'], true).toLocal();
     }
     this.chargingSpeed = ChargingSpeed.NONE;
     this.isConnected = recs['plugStatus'] != 0;
     this.isCharging = isConnected && recs['chargeStatus'] > 0;
-    this.batteryPercentage =
+    this.batteryPercentage = recs['batteryLevel'];
+    this.batteryPercentageText =
         NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
     this.cruisingRangeAcOffKm =
         unitCalculator.toKilometersPretty(recs['batteryAutonomy'].toDouble()) +
-            ' km';
+        ' km';
     this.cruisingRangeAcOffMiles =
         unitCalculator.toMilesPretty(recs['batteryAutonomy'].toDouble()) +
-            ' mi';
+        ' mi';
     this.cruisingRangeAcOnKm =
         unitCalculator.toKilometersPretty(recs['batteryAutonomy'].toDouble()) +
-            ' km';
+        ' km';
     this.cruisingRangeAcOnMiles =
         unitCalculator.toMilesPretty(recs['batteryAutonomy'].toDouble()) +
-            ' mi';
+        ' mi';
     this.timeToFullFast = Duration(minutes: recs['chargingRemainingTime']);
     switch (this.chargingSpeed) {
       case ChargingSpeed.SLOW:
@@ -75,27 +77,28 @@ class NissanConnectBattery {
     // For reasons unknown the lastUpdateTime sometimes includes
     // seconds and sometimes not
     try {
-      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-          .parse(recs['lastUpdateTime'], true)
-          .toLocal();
+      this.dateTime = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+      ).parse(recs['lastUpdateTime'], true).toLocal();
     } catch (e) {
-      this.dateTime = DateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-          .parse(recs['lastUpdateTime'], true)
-          .toLocal();
+      this.dateTime = DateFormat(
+        "yyyy-MM-dd'T'HH:mm'Z'",
+      ).parse(recs['lastUpdateTime'], true).toLocal();
     }
     this.chargingSpeed = ChargingSpeed.values[recs['chargePower'] ?? 0];
     this.isConnected = recs['plugStatus'] != 0;
     this.isCharging = recs['chargeStatus'] != 0;
-    this.batteryPercentage =
+    this.batteryPercentage = recs['batteryLevel'];
+    this.batteryPercentageText =
         NumberFormat('0.0').format(recs['batteryLevel']).toString() + '%';
     this.cruisingRangeAcOffKm =
         unitCalculator.toKilometersPretty(recs['rangeHvacOff'].toDouble()) +
-            ' km';
+        ' km';
     this.cruisingRangeAcOffMiles =
         unitCalculator.toMilesPretty(recs['rangeHvacOff'].toDouble()) + ' mi';
     this.cruisingRangeAcOnKm =
         unitCalculator.toKilometersPretty(recs['rangeHvacOn'].toDouble()) +
-            ' km';
+        ' km';
     this.cruisingRangeAcOnMiles =
         unitCalculator.toMilesPretty(recs['rangeHvacOn'].toDouble()) + ' mi';
     this.timeToFullSlow = Duration(minutes: recs['timeRequiredToFullSlow']);

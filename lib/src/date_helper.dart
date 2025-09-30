@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 String _digits(int value, int length) {
   String ret = '$value';
   if (ret.length < length) {
