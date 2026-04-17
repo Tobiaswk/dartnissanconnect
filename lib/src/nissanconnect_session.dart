@@ -99,8 +99,10 @@ class Services {
 
   Services(this._services);
 
-  bool hasService(int id) => _services.any((service) =>
-      service['id'] == id && service['activationState'] == 'ACTIVATED');
+  bool hasService(int id) => _services.any(
+    (service) =>
+        service['id'] == id && service['activationState'] == 'ACTIVATED',
+  );
 }
 
 class NissanConnectSession {
@@ -120,8 +122,8 @@ class NissanConnectSession {
       'user_adapter_base_url': // userAdapter_eu_prod
           'https://alliance-platform-usersadapter-prod.apps.eu2.kamereon.io/user-adapter/',
       'user_base_url':
-          'https://nci-bff-web-prod.apps.eu2.kamereon.io/bff-web/' // bffWeb_eu_prod
-    }
+          'https://nci-bff-web-prod.apps.eu2.kamereon.io/bff-web/', // bffWeb_eu_prod
+    },
   };
 
   var API_VERSION = 'protocol=1.0,resource=2.1';
@@ -142,16 +144,18 @@ class NissanConnectSession {
 
   NissanConnectSession({this.debug = false});
 
-  Future<NissanConnectResponse> requestWithRetry(
-      {required String endpoint,
-      String method = 'POST',
-      Map<String, String>? additionalHeaders,
-      Map? params}) async {
+  Future<NissanConnectResponse> requestWithRetry({
+    required String endpoint,
+    String method = 'POST',
+    Map<String, String>? additionalHeaders,
+    Map? params,
+  }) async {
     NissanConnectResponse response = await request(
-        endpoint: endpoint,
-        method: method,
-        additionalHeaders: additionalHeaders,
-        params: params);
+      endpoint: endpoint,
+      method: method,
+      additionalHeaders: additionalHeaders,
+      params: params,
+    );
 
     if (response.statusCode >= 400) {
       _print('Signing in and trying request again: $response');
@@ -159,19 +163,21 @@ class NissanConnectSession {
       await login(username: username, password: password);
 
       response = await request(
-          endpoint: endpoint,
-          method: method,
-          additionalHeaders: additionalHeaders,
-          params: params);
+        endpoint: endpoint,
+        method: method,
+        additionalHeaders: additionalHeaders,
+        params: params,
+      );
     }
     return response;
   }
 
-  Future<NissanConnectResponse> request(
-      {required String endpoint,
-      String method = 'POST',
-      Map<String, String>? additionalHeaders,
-      Map? params}) async {
+  Future<NissanConnectResponse> request({
+    required String endpoint,
+    String method = 'POST',
+    Map<String, String>? additionalHeaders,
+    Map? params,
+  }) async {
     _print('Invoking NissanConnect/Kamereon API: $endpoint');
     _print('Params: $params');
 
@@ -193,8 +199,11 @@ class NissanConnectSession {
         response = await http.get(Uri.parse(endpoint), headers: headers);
         break;
       default:
-        response = await http.post(Uri.parse(endpoint),
-            headers: headers, body: json.encode(params));
+        response = await http.post(
+          Uri.parse(endpoint),
+          headers: headers,
+          body: json.encode(params),
+        );
     }
 
     dynamic jsonData;
@@ -206,11 +215,16 @@ class NissanConnectSession {
     }
 
     return NissanConnectResponse(
-        response.statusCode, response.headers, jsonData);
+      response.statusCode,
+      response.headers,
+      jsonData,
+    );
   }
 
-  Future<NissanConnectVehicle> login(
-      {required String username, required String password}) async {
+  Future<NissanConnectVehicle> login({
+    required String username,
+    required String password,
+  }) async {
     this.username = username;
     this.password = password;
     this.bearerToken = null;
@@ -219,15 +233,16 @@ class NissanConnectSession {
     /// This Referer opens in a web view when you try to login with the official app
     /// We first get the authId used in the next POST (which is fetched automatically in web view using the above Referer)
     NissanConnectResponse response = await request(
-        endpoint:
-            '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
-        additionalHeaders: <String, String>{
-          'Accept-Api-Version': API_VERSION,
-          'X-Username': 'anonymous',
-          'X-Password': 'anonymous',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        });
+      endpoint:
+          '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
+      additionalHeaders: <String, String>{
+        'Accept-Api-Version': API_VERSION,
+        'X-Username': 'anonymous',
+        'X-Password': 'anonymous',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
 
     var authId = response.body['authId'];
 
@@ -238,41 +253,42 @@ class NissanConnectSession {
     var retries = 10;
     do {
       response = await request(
-          endpoint:
-              '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
-          additionalHeaders: <String, String>{
-            'Accept-Api-Version': API_VERSION,
-            'X-Username': 'anonymous',
-            'X-Password': 'anonymous',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          params: {
-            'authId': authId,
-            'template': '',
-            'stage': 'LDAP1',
-            'header': 'Sign in',
-            'callbacks': [
-              {
-                'type': 'NameCallback',
-                'output': [
-                  {'name': 'prompt', 'value': 'User Name:'}
-                ],
-                'input': [
-                  {'name': 'IDToken1', 'value': username}
-                ]
-              },
-              {
-                'type': 'PasswordCallback',
-                'output': [
-                  {'name': 'prompt', 'value': 'Password:'}
-                ],
-                'input': [
-                  {'name': 'IDToken2', 'value': password}
-                ]
-              }
-            ]
-          });
+        endpoint:
+            '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
+        additionalHeaders: <String, String>{
+          'Accept-Api-Version': API_VERSION,
+          'X-Username': 'anonymous',
+          'X-Password': 'anonymous',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        params: {
+          'authId': authId,
+          'template': '',
+          'stage': 'LDAP1',
+          'header': 'Sign in',
+          'callbacks': [
+            {
+              'type': 'NameCallback',
+              'output': [
+                {'name': 'prompt', 'value': 'User Name:'},
+              ],
+              'input': [
+                {'name': 'IDToken1', 'value': username},
+              ],
+            },
+            {
+              'type': 'PasswordCallback',
+              'output': [
+                {'name': 'prompt', 'value': 'Password:'},
+              ],
+              'input': [
+                {'name': 'IDToken2', 'value': password},
+              ],
+            },
+          ],
+        },
+      );
       _print('Authenticating (retries left: $retries)');
     } while (response.statusCode == 401 && retries-- > 0);
 
@@ -284,13 +300,14 @@ class NissanConnectSession {
     String code = "";
     try {
       response = await request(
-          endpoint:
-              '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez&state=af0ifjsldkj',
-          additionalHeaders: <String, String>{
-            'Cookie':
-                'i18next=en-UK; amlbcookie=05; kauthSession=\"$authCookie\"'
-          },
-          method: 'GET');
+        endpoint:
+            '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez&state=af0ifjsldkj',
+        additionalHeaders: <String, String>{
+          'Cookie':
+              'i18next=en-UK; amlbcookie=05; kauthSession=\"$authCookie\"',
+        },
+        method: 'GET',
+      );
       print(response.body);
     } on ArgumentError catch (e) {
       code = e.message.split('=')[1].split('&')[0];
@@ -300,33 +317,38 @@ class NissanConnectSession {
       endpoint:
           '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/access_token?code=${code}&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
       additionalHeaders: <String, String>{
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
     );
 
     this.bearerToken = response.body['access_token'];
 
     response = await request(
-        endpoint: '${settings['EU']['user_adapter_base_url']}v1/users/current',
-        method: 'GET');
+      endpoint: '${settings['EU']['user_adapter_base_url']}v1/users/current',
+      method: 'GET',
+    );
 
     userId = response.body['userId'];
 
     response = await request(
-        endpoint: '${settings['EU']['user_base_url']}v5/users/$userId/cars',
-        method: 'GET');
+      endpoint: '${settings['EU']['user_base_url']}v5/users/$userId/cars',
+      method: 'GET',
+    );
 
     vehicles = [];
 
     for (Map vehicle in response.body['data']) {
-      vehicles.add(NissanConnectVehicle(
-        this,
-        Services(vehicle['services'] ?? []),
-        vehicle['vin'],
-        vehicle['modelName'],
-        vehicle['nickname'] ?? '${vehicle['modelName']} ${vehicles.length + 1}',
-        vehicle['canGeneration'],
-      ));
+      vehicles.add(
+        NissanConnectVehicle(
+          this,
+          Services(vehicle['services'] ?? []),
+          vehicle['vin'],
+          vehicle['modelName'],
+          vehicle['nickname'] ??
+              '${vehicle['modelName']} ${vehicles.length + 1}',
+          vehicle['canGeneration'],
+        ),
+      );
     }
 
     return vehicle = vehicles.first;
