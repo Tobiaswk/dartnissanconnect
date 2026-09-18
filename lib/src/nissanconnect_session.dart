@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dartnissanconnect/src/nissanconnect_response.dart';
 import 'package:dartnissanconnect/src/nissanconnect_vehicle.dart';
 import 'package:dartnissanconnect/src/util/my_nissan_settings.dart';
 import 'package:dartnissanconnect/src/util/pkce.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:http/http.dart' as http;
 
 class Services {
