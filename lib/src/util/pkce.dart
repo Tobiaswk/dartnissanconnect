@@ -17,7 +17,6 @@ class PKCEUtil {
       buffer.write(_allowedChars[rng.nextInt(_allowedChars.length)]);
     }
     codeVerifier = buffer.toString();
-    // Replace with your logger: e.g., debugPrint('Generated Code Verifier = $codeVerifier');
     return codeVerifier!;
   }
 
@@ -29,7 +28,6 @@ class PKCEUtil {
     final digest = sha256.convert(utf8.encode(verifier));
     // RFC 7636 requires base64url without padding
     codeChallenge = base64Url.encode(digest.bytes).replaceAll('=', '');
-    // Replace with your logger: e.g., debugPrint('Computed Code Challenge = $codeChallenge');
     return codeChallenge!;
   }
 }
