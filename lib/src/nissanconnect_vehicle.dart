@@ -2,6 +2,7 @@ import 'package:dartnissanconnect/dartnissanconnect.dart';
 import 'package:dartnissanconnect/src/date_helper.dart';
 import 'package:dartnissanconnect/src/nissanconnect_hvac.dart';
 import 'package:dartnissanconnect/src/nissanconnect_lock_status.dart';
+import 'package:dartnissanconnect/src/util/my_nissan_settings.dart';
 import 'package:intl/intl.dart';
 
 enum NissanConnectPeriod { daily, monthly, yearly }
@@ -38,7 +39,7 @@ class NissanConnectVehicle {
   Future<bool> requestBatteryStatusRefresh() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-battery-status',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/refresh-battery-status',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -57,7 +58,7 @@ class NissanConnectVehicle {
         return NissanConnectBattery.leaf(
           (await session.requestWithRetry(
             endpoint:
-                '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/battery-status',
+                '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/battery-status',
             method: 'GET',
           )).body,
         );
@@ -65,7 +66,7 @@ class NissanConnectVehicle {
         return NissanConnectBattery.ariya(
           (await session.requestWithRetry(
             endpoint:
-                '${session.settings['EU']['user_base_url']}v3/cars/$vin/battery-status?canGen=$canGeneration',
+                '${MyNissanSettings.eu.userBaseUrl}v3/cars/$vin/battery-status?canGen=$canGeneration',
             method: 'GET',
           )).body,
         );
@@ -87,7 +88,7 @@ class NissanConnectVehicle {
     }
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.monthly.index}',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.monthly.index}',
       method: 'GET',
     );
     return NissanConnectStats(
@@ -100,7 +101,7 @@ class NissanConnectVehicle {
     var end = start;
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.daily.index}',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.daily.index}',
       method: 'GET',
     );
     return NissanConnectStats(
@@ -126,7 +127,7 @@ class NissanConnectVehicle {
     }
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.daily.index}',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/trip-history?start=${_targetDateFormatter.format(start)}&end=${_targetDateFormatter.format(end)}&type=${NissanConnectPeriod.daily.index}',
       method: 'GET',
     );
     return NissanConnectStats.list(response.body);
@@ -135,7 +136,7 @@ class NissanConnectVehicle {
   Future<bool> requestChargingStart() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/charging-start',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/charging-start',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -153,7 +154,7 @@ class NissanConnectVehicle {
   Future<bool> requestChargingStop() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/charging-start',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/charging-start',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -171,7 +172,7 @@ class NissanConnectVehicle {
   Future<bool> requestEngineStart() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/engine-start',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/engine-start',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -189,7 +190,7 @@ class NissanConnectVehicle {
   ) async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/hvac-start',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/hvac-start',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -213,7 +214,7 @@ class NissanConnectVehicle {
   Future<bool> requestClimateControlScheduledCancel() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/hvac-start',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/hvac-start',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -231,7 +232,7 @@ class NissanConnectVehicle {
   Future<bool> requestClimateControlOff() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/hvac-start',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/hvac-start',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -255,7 +256,7 @@ class NissanConnectVehicle {
   Future<bool> requestClimateControlStatusRefresh() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-hvac-status',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/refresh-hvac-status',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -269,7 +270,7 @@ class NissanConnectVehicle {
   Future<NissanConnectHVAC> requestClimateControlStatus() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/hvac-status',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/hvac-status',
       method: 'GET',
     );
 
@@ -279,7 +280,7 @@ class NissanConnectVehicle {
   Future<bool> requestLocationRefresh() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/refresh-location',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/refresh-location',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -293,8 +294,7 @@ class NissanConnectVehicle {
 
   Future<NissanConnectLocation> requestLocation() async {
     var response = await session.requestWithRetry(
-      endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/location',
+      endpoint: '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/location',
       method: 'GET',
     );
 
@@ -304,7 +304,7 @@ class NissanConnectVehicle {
   Future<bool> requestHorn({bool on = true, int? duration = 2}) async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/horn-lights',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/horn-lights',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -326,7 +326,7 @@ class NissanConnectVehicle {
   Future<bool> requestLights({bool on = true, int? duration = 2}) async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/horn-lights',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/horn-lights',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -348,7 +348,7 @@ class NissanConnectVehicle {
   Future<bool> requestHornAndLights({bool on = true, int? duration = 2}) async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/horn-lights',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/horn-lights',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -373,7 +373,7 @@ class NissanConnectVehicle {
   }) async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/lock-unlock',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/lock-unlock',
       additionalHeaders: <String, String>{
         'Content-Type': 'application/vnd.api+json',
       },
@@ -395,7 +395,7 @@ class NissanConnectVehicle {
   Future<NissanConnectLockStatus> requestLockStatus() async {
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/lock-status',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/lock-status',
       method: 'GET',
     );
 
@@ -404,8 +404,7 @@ class NissanConnectVehicle {
 
   Future<String> _requestUserId() async {
     var response = await session.requestWithRetry(
-      endpoint:
-          '${session.settings['EU']['user_adapter_base_url']}v1/users/current',
+      endpoint: '${MyNissanSettings.eu.userBaseUrl}v1/users/current',
       method: 'GET',
     );
 
@@ -426,7 +425,7 @@ class NissanConnectVehicle {
 
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/srp-initiates',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/srp-initiates',
       params: {
         'data': {
           'type': 'SrpInitiates',
@@ -447,7 +446,7 @@ class NissanConnectVehicle {
 
     var response = await session.requestWithRetry(
       endpoint:
-          '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/srp-sets',
+          '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/srp-sets',
       params: {
         'data': {
           'type': 'SrpSets',
@@ -463,9 +462,9 @@ class NissanConnectVehicle {
     int pollRetries = 8;
 
     while (pollRetries-- > 0) {
-      var response = await session.request(
+      var response = await session.requestWithRetry(
         endpoint:
-            '${session.settings['EU']['car_adapter_base_url']}v1/cars/$vin/actions/status?actionId=$actionId',
+            '${MyNissanSettings.eu.carAdapterBaseUrl}v1/cars/$vin/actions/status?actionId=$actionId',
         method: 'GET',
       );
 
