@@ -121,6 +121,7 @@ class NissanConnectSession {
   late String username;
   late String password;
   String? bearerToken;
+  String? clientToken;
 
   late String userId;
 
@@ -190,6 +191,10 @@ class NissanConnectSession {
       headers['Authorization'] = 'Bearer $bearerToken';
     }
 
+    if (clientToken != null) {
+      headers['client-token'] = clientToken!;
+    }
+
     if (additionalHeaders != null) {
       headers.addAll(additionalHeaders);
     }
@@ -235,14 +240,14 @@ class NissanConnectSession {
     final codeVerifier = PKCEUtil.generateCodeVerifier();
     final codeChallenge = PKCEUtil.computeCodeChallengeS256(codeVerifier);
 
-    var response = await dio.get(
+    var authResponse = await dio.get(
       '${MyNissanSettings.eu.authBaseUrl}/oauth2/authorize?response_type=code&redirect_uri=com://wso2.service.nci&client_id=${MyNissanSettings.eu.clientId}&state=request_0&scope=openid+name+profile+email+offline_access&code_challenge=$codeChallenge&code_challenge_method=S256&locale=da_DK&brand=Nissan&client=${MyNissanSettings.eu.client}',
     );
 
     var locationParams =
-        response.redirects.firstOrNull?.location.queryParameters;
+        authResponse.redirects.firstOrNull?.location.queryParameters;
 
-    response = await dio.post(
+    authResponse = await dio.post(
       '${MyNissanSettings.eu.authBaseUrl}/commonauth',
       data: {
         'regionCode': 'NG',
@@ -259,10 +264,10 @@ class NissanConnectSession {
     );
 
     final sessionDataKey = Uri.parse(
-      response.headers.value('location') ?? '',
+      authResponse.headers.value('location') ?? '',
     ).queryParameters['sessionDataKey'];
 
-    response = await dio.get(
+    authResponse = await dio.get(
       '${MyNissanSettings.eu.authBaseUrl}/oauth2/authorize',
       queryParameters: {'sessionDataKey': sessionDataKey},
       options: Options(
@@ -273,10 +278,10 @@ class NissanConnectSession {
     );
 
     final params = Uri.parse(
-      response.headers.value('location') ?? '',
+      authResponse.headers.value('location') ?? '',
     ).queryParameters;
 
-    response = await dio.post(
+    authResponse = await dio.post(
       '${MyNissanSettings.eu.authBaseUrl}/oauth2/token',
       queryParameters: {
         'redirect_uri': 'com://wso2.service.nci',
@@ -289,42 +294,47 @@ class NissanConnectSession {
       options: Options(contentType: Headers.formUrlEncodedContentType),
     );
 
-    this.bearerToken = json.decode(response.data)['access_token'];
+    this.clientToken = authResponse.data['access_token'];
 
-    // locationParams = response.redirects.first.location.queryParameters;
-    // print(locationParams);
-    // response = await request(
-    //   endpoint:
-    //       '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/access_token?code=${locationParams['code']}&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
-    //   additionalHeaders: <String, String>{
-    //     'Content-Type': 'application/x-www-form-urlencoded',
-    //   },
-    // );
-    // this.bearerToken = response.response.body['access_token'];
-    // response = await request(
-    //   endpoint: '${settings['EU']['user_adapter_base_url']}v1/users/current',
-    //   method: 'GET',
-    // );
-    // userId = response.response.body['userId'];
-    // response = await request(
-    //   endpoint: '${settings['EU']['user_base_url']}v5/users/$userId/cars',
-    //   method: 'GET',
-    // );
+    final idToken = authResponse.data['id_token'];
+
+    authResponse = await dio.post(
+      '${MyNissanSettings.eu.userBaseUrl}/v1/oauth2/access_token',
+      queryParameters: {'platform': 'Android'},
+      options: Options(
+        contentType: 'application/vnd.api+json',
+        headers: {'authorization': idToken},
+      ),
+    );
+
+    this.bearerToken = authResponse.data['access_token'];
+
+    NissanConnectResponse response = await request(
+      endpoint: '${MyNissanSettings.eu.userAdapterBaseUrl}/v1/users/current',
+      method: 'GET',
+    );
+
+    userId = response.body['userId'];
+
+    response = await request(
+      endpoint: '${MyNissanSettings.eu.userBaseUrl}/v1/users/garage',
+      method: 'GET',
+    );
     vehicles = [];
 
-    // for (Map vehicle in response.response.body['data']) {
-    //   vehicles.add(
-    //     NissanConnectVehicle(
-    //       this,
-    //       Services(vehicle['services'] ?? []),
-    //       vehicle['vin'],
-    //       vehicle['modelName'],
-    //       vehicle['nickname'] ??
-    //           '${vehicle['modelName']} ${vehicles.length + 1}',
-    //       vehicle['canGeneration'],
-    //     ),
-    //   );
-    // }
+    for (Map vehicle in response.body['data']['attributes']['vehicleList']) {
+      vehicles.add(
+        NissanConnectVehicle(
+          this,
+          Services(vehicle['services'] ?? []),
+          vehicle['vin'],
+          vehicle['modelName'],
+          vehicle['nickname'] ??
+              '${vehicle['modelName']} ${vehicles.length + 1}',
+          vehicle['canGeneration'] ?? '',
+        ),
+      );
+    }
 
     return vehicle = vehicles.first;
   }

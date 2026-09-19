@@ -54,12 +54,12 @@ abstract final class MyNissanSettings {
     redirectUri: 'com://wso2.service.nci',
     // carAdapter_eu_prod
     carAdapterBaseUrl:
-        'https://alliance-platform-caradapter-prod.apps.eu2.kamereon.io/car-adapter/',
+        'https://alliance-platform-caradapter-prod.apps.eu2.kamereon.io/car-adapter',
     // userAdapter_eu_prod
     userAdapterBaseUrl:
-        'https://alliance-platform-usersadapter-prod.apps.eu2.kamereon.io/user-adapter/',
+        'https://alliance-platform-usersadapter-prod.apps.eu2.kamereon.io/user-adapter',
     // bffWeb_eu_prod
-    userBaseUrl: 'https://nci-bff-web-prod.apps.eu2.kamereon.io/bff-web/',
+    userBaseUrl: 'https://nci-bff-web-prod.apps.eu2.kamereon.io/bff-web',
   );
 
   static const Map<MyNissanRegion, MyNissanRegionSettings> byRegion =
