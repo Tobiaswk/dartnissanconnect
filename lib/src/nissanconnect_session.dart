@@ -3,6 +3,9 @@ import 'dart:convert';
 
 import 'package:dartnissanconnect/src/nissanconnect_response.dart';
 import 'package:dartnissanconnect/src/nissanconnect_vehicle.dart';
+import 'package:dartnissanconnect/src/util/my_nissan_settings.dart';
+import 'package:dartnissanconnect/src/util/pkce.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
 class Services {
@@ -106,29 +109,11 @@ class Services {
 }
 
 class NissanConnectSession {
-  Map settings = <String, Map>{
-    'EU': <String, String>{
-      'client_id': 'a-ncb-nc-android-prod', // CLIENT_ID_V2_EU_PROD_NEW
-      'client_secret':
-          '6GKIax7fGT5yPHuNmWNVOc4q5POBw1WRSW39ubRA8WPBmQ7MOxhm75EsmKMKENem', // CLIENT_SECRET_V2_EU_PROD_NEW
-      'scope': 'openid profile vehicles', // API_SCOPE_V2_EU_PROD_NEW
-      'auth_base_url':
-          'https://prod.eu2.auth.kamereon.org/kauth/', // OAUTH_AUTHORIZATION_BASE_URL_V2_EU_PROD_NEW
-      'realm':
-          'a-ncb-prod', // OAUTH_REALM_DEFAULT_V2_EU_PROD_NEW CLIENT_ID_V2_EU_PROD_NEW
-      'redirect_uri': 'org.kamereon.service.nci:/oauth2redirect',
-      'car_adapter_base_url': // carAdapter_eu_prod
-          'https://alliance-platform-caradapter-prod.apps.eu2.kamereon.io/car-adapter/',
-      'user_adapter_base_url': // userAdapter_eu_prod
-          'https://alliance-platform-usersadapter-prod.apps.eu2.kamereon.io/user-adapter/',
-      'user_base_url':
-          'https://nci-bff-web-prod.apps.eu2.kamereon.io/bff-web/', // bffWeb_eu_prod
-    },
-  };
-
   var API_VERSION = 'protocol=1.0,resource=2.1';
   var SRP_KEY =
       'D5AF0E14718E662D12DBB4FE42304DF5A8E48359E22261138B40AA16CC85C76A11B43200A1EECB3C9546A262D1FBD51ACE6FCDE558C00665BBF93FF86B9F8F76AA7A53CA74F5B4DFF9A4B847295E7D82450A2078B5A28814A7A07F8BBDD34F8EEB42B0E70499087A242AA2C5BA9513C8F9D35A81B33A121EEF0A71F3F9071CCD';
+
+  Dio dio = Dio();
 
   bool debug;
   List<String> debugLog = [];
@@ -136,13 +121,32 @@ class NissanConnectSession {
   late String username;
   late String password;
   String? bearerToken;
+  String? clientToken;
 
   late String userId;
 
   late NissanConnectVehicle vehicle;
   late List<NissanConnectVehicle> vehicles;
 
-  NissanConnectSession({this.debug = false});
+  NissanConnectSession({this.debug = false}) {
+    // dio.httpClientAdapter = IOHttpClientAdapter(
+    //   createHttpClient: () {
+    //     final client = HttpClient();
+    //     // Config the client.
+    //     client.findProxy = (uri) {
+    //       // Forward all request to proxy "localhost:8888".
+    //       // Be aware, the proxy should went through you running device,
+    //       // not the host platform.
+    //       return 'PROXY 192.168.1.154:8888';
+    //     };
+
+    //     client.badCertificateCallback = (_, __, ___) => true;
+    //     // You can also create a new HttpClient for Dio instead of returning,
+    //     // but a client must being returned here.
+    //     return client;
+    //   },
+    // );
+  }
 
   Future<NissanConnectResponse> requestWithRetry({
     required String endpoint,
@@ -187,6 +191,10 @@ class NissanConnectSession {
       headers['Authorization'] = 'Bearer $bearerToken';
     }
 
+    if (clientToken != null) {
+      headers['client-token'] = clientToken!;
+    }
+
     if (additionalHeaders != null) {
       headers.addAll(additionalHeaders);
     }
@@ -229,115 +237,92 @@ class NissanConnectSession {
     this.password = password;
     this.bearerToken = null;
 
-    /// The Referer to this POST; https://prod.eu2.auth.kamereon.org/kauth/XUI/?realm=/a-ncb-prod&locale=da&authIndexType=service&authIndexValue=nissan&goto=https://prod.eu2.auth.kamereon.org:443/kauth/oauth2/a-ncb-prod/authorize?client_id%3Da-ncb-nc-android-prod%26redirect_uri%3Dorg.kamereon.service.nci:/oauth2redirect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520vehicles%26state%3Daf0ifjsldkj%26nonce%3Dsdfdsfez%26locale%3Dda%26acr_values%3Dnissan
-    /// This Referer opens in a web view when you try to login with the official app
-    /// We first get the authId used in the next POST (which is fetched automatically in web view using the above Referer)
+    final codeVerifier = PKCEUtil.generateCodeVerifier();
+    final codeChallenge = PKCEUtil.computeCodeChallengeS256(codeVerifier);
+
+    var authResponse = await dio.get(
+      '${MyNissanSettings.eu.authBaseUrl}/oauth2/authorize?response_type=code&redirect_uri=com://wso2.service.nci&client_id=${MyNissanSettings.eu.clientId}&state=request_0&scope=openid+name+profile+email+offline_access&code_challenge=$codeChallenge&code_challenge_method=S256&locale=da_DK&brand=Nissan&client=${MyNissanSettings.eu.client}',
+    );
+
+    var locationParams =
+        authResponse.redirects.firstOrNull?.location.queryParameters;
+
+    authResponse = await dio.post(
+      '${MyNissanSettings.eu.authBaseUrl}/commonauth',
+      data: {
+        'regionCode': 'NG',
+        'username': 'NG/$username',
+        'userName': username,
+        'password': password,
+        'sessionDataKey': locationParams?['sessionDataKey'],
+      },
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) => status != null && status < 400,
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    final sessionDataKey = Uri.parse(
+      authResponse.headers.value('location') ?? '',
+    ).queryParameters['sessionDataKey'];
+
+    authResponse = await dio.get(
+      '${MyNissanSettings.eu.authBaseUrl}/oauth2/authorize',
+      queryParameters: {'sessionDataKey': sessionDataKey},
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) => status != null && status < 400,
+        contentType: Headers.formUrlEncodedContentType,
+      ),
+    );
+
+    final params = Uri.parse(
+      authResponse.headers.value('location') ?? '',
+    ).queryParameters;
+
+    authResponse = await dio.post(
+      '${MyNissanSettings.eu.authBaseUrl}/oauth2/token',
+      queryParameters: {
+        'redirect_uri': 'com://wso2.service.nci',
+        'grant_type': 'authorization_code',
+        'client_id': MyNissanSettings.eu.clientId,
+        'code': params['code'],
+        'code_verifier': codeVerifier,
+        'scope': MyNissanSettings.eu.scope,
+      },
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+
+    this.clientToken = authResponse.data['access_token'];
+
+    final idToken = authResponse.data['id_token'];
+
+    authResponse = await dio.post(
+      '${MyNissanSettings.eu.userBaseUrl}/v1/oauth2/access_token',
+      queryParameters: {'platform': 'Android'},
+      options: Options(
+        contentType: 'application/vnd.api+json',
+        headers: {'authorization': idToken},
+      ),
+    );
+
+    this.bearerToken = authResponse.data['access_token'];
+
     NissanConnectResponse response = await request(
-      endpoint:
-          '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
-      additionalHeaders: <String, String>{
-        'Accept-Api-Version': API_VERSION,
-        'X-Username': 'anonymous',
-        'X-Password': 'anonymous',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    );
-
-    var authId = response.body['authId'];
-
-    /// For some reason this request can sometimes fail giving a HTTP status code 401;
-    ///   code: 401, reason: Unauthorized, message: Session has timed out, detail: {errorCode: 110}
-    /// Therefore we retry this request if it fails; a maximum of 10 retries
-    /// A real solution should be investigated
-    var retries = 10;
-    do {
-      response = await request(
-        endpoint:
-            '${settings['EU']['auth_base_url']}json/realms/root/realms/${settings['EU']['realm']}/authenticate',
-        additionalHeaders: <String, String>{
-          'Accept-Api-Version': API_VERSION,
-          'X-Username': 'anonymous',
-          'X-Password': 'anonymous',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        params: {
-          'authId': authId,
-          'template': '',
-          'stage': 'LDAP1',
-          'header': 'Sign in',
-          'callbacks': [
-            {
-              'type': 'NameCallback',
-              'output': [
-                {'name': 'prompt', 'value': 'User Name:'},
-              ],
-              'input': [
-                {'name': 'IDToken1', 'value': username},
-              ],
-            },
-            {
-              'type': 'PasswordCallback',
-              'output': [
-                {'name': 'prompt', 'value': 'Password:'},
-              ],
-              'input': [
-                {'name': 'IDToken2', 'value': password},
-              ],
-            },
-          ],
-        },
-      );
-      _print('Authenticating (retries left: $retries)');
-    } while (response.statusCode == 401 && retries-- > 0);
-
-    var authCookie = response.body['tokenId'];
-
-    /// Extremely dirty
-    /// The http client throws an error due to an invalid URI from the API
-    /// We parse the code used for authentication from the error message
-    String code = "";
-    try {
-      response = await request(
-        endpoint:
-            '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/authorize?client_id=${settings['EU']['client_id']}&redirect_uri=${settings['EU']['redirect_uri']}&response_type=code&scope=${settings['EU']['scope']}&nonce=sdfdsfez&state=af0ifjsldkj',
-        additionalHeaders: <String, String>{
-          'Cookie':
-              'i18next=en-UK; amlbcookie=05; kauthSession=\"$authCookie\"',
-        },
-        method: 'GET',
-      );
-      print(response.body);
-    } on ArgumentError catch (e) {
-      code = e.message.split('=')[1].split('&')[0];
-    }
-
-    response = await request(
-      endpoint:
-          '${settings['EU']['auth_base_url']}oauth2/${settings['EU']['realm']}/access_token?code=${code}&client_id=${settings['EU']['client_id']}&client_secret=${settings['EU']['client_secret']}&redirect_uri=${settings['EU']['redirect_uri']}&grant_type=authorization_code',
-      additionalHeaders: <String, String>{
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    );
-
-    this.bearerToken = response.body['access_token'];
-
-    response = await request(
-      endpoint: '${settings['EU']['user_adapter_base_url']}v1/users/current',
+      endpoint: '${MyNissanSettings.eu.userAdapterBaseUrl}/v1/users/current',
       method: 'GET',
     );
 
     userId = response.body['userId'];
 
     response = await request(
-      endpoint: '${settings['EU']['user_base_url']}v5/users/$userId/cars',
+      endpoint: '${MyNissanSettings.eu.userBaseUrl}/v1/users/garage',
       method: 'GET',
     );
-
     vehicles = [];
 
-    for (Map vehicle in response.body['data']) {
+    for (Map vehicle in response.body['data']['attributes']['vehicleList']) {
       vehicles.add(
         NissanConnectVehicle(
           this,
@@ -346,7 +331,7 @@ class NissanConnectSession {
           vehicle['modelName'],
           vehicle['nickname'] ??
               '${vehicle['modelName']} ${vehicles.length + 1}',
-          vehicle['canGeneration'],
+          vehicle['canGeneration'] ?? '',
         ),
       );
     }
