@@ -277,9 +277,8 @@ class NissanConnectSession {
       ),
     );
 
-    final params = Uri.parse(
-      authResponse.headers.value('location') ?? '',
-    ).queryParameters;
+    final params = Uri.parse(authResponse.headers.value('location') ?? '')
+        .queryParameters;
 
     authResponse = await dio.post(
       '${MyNissanSettings.eu.authBaseUrl}/oauth2/token',
@@ -316,13 +315,14 @@ class NissanConnectSession {
 
     userId = response.body['userId'];
 
-    response = await request(
-      endpoint: '${MyNissanSettings.eu.userBaseUrl}/v1/users/garage',
-      method: 'GET',
-    );
     vehicles = [];
 
-    for (Map vehicle in response.body['data']['attributes']['vehicleList']) {
+    response = await request(
+      endpoint: '${MyNissanSettings.eu.userBaseUrl}/v5/users/$userId/cars',
+      method: 'GET',
+    );
+
+    for (Map vehicle in response.body['data']) {
       vehicles.add(
         NissanConnectVehicle(
           this,
